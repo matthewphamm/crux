@@ -43,8 +43,8 @@ struct LogView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) { SettingsToolbarButton() }
             }
-            .safeAreaInset(edge: .bottom, spacing: 0) { actionBar }
             .logToast()
+            .safeAreaInset(edge: .bottom, spacing: 0) { actionBar }
             .navigationDestination(for: Climb.self) { climb in
                 ClimbDetailView(climb: climb)
                     .navigationTransition(.zoom(sourceID: climb.id, in: namespace))

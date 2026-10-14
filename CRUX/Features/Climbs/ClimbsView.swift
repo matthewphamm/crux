@@ -269,7 +269,8 @@ struct ClimbRow: View {
     private var subtitle: String {
         var parts = [climb.grade.vRange]
         if let wall = climb.wall?.name { parts.append(wall) }
-        if let tag = climb.styleTags.sorted(by: { $0.rawValue < $1.rawValue }).first { parts.append(tag.name) }
+        let tags = climb.styleTags.map(\.name).sorted().filter { $0.caseInsensitiveCompare(climb.wall?.name ?? "") != .orderedSame }
+        if let tag = tags.first { parts.append(tag) }
         return parts.joined(separator: " · ")
     }
 }

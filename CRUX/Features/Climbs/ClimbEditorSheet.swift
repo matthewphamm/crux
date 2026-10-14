@@ -165,10 +165,11 @@ struct ClimbEditorSheet: View {
                     Button {
                         showingNewWall = true
                     } label: {
-                        Label("Wall", systemImage: "plus").font(.caption.weight(.medium))
-                            .padding(.horizontal, 10).padding(.vertical, 5)
+                        TagPill(text: "+ Wall")
+                            .font(.subheadline)
                     }
-                    .buttonStyle(.glass)
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Add wall")
                 }
             }
         }
@@ -239,7 +240,7 @@ struct ClimbEditorSheet: View {
                 Button {
                     save(log: .attempt)
                 } label: {
-                    Text("Save & log attempt").font(.body.weight(.semibold)).frame(maxWidth: .infinity, minHeight: 32)
+                    Text("Save & log").font(.body.weight(.semibold)).frame(maxWidth: .infinity, minHeight: 32)
                 }
                 .buttonStyle(.glassProminent)
             }

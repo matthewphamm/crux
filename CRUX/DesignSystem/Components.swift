@@ -227,6 +227,7 @@ struct ToastView: View {
 enum Format {
     static func duration(_ interval: TimeInterval) -> String {
         let minutes = max(Int(interval / 60), 0)
+        guard minutes > 0 else { return "<1m" }
         let hours = minutes / 60
         return hours > 0 ? "\(hours)h \(minutes % 60)m" : "\(minutes)m"
     }
