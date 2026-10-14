@@ -1,0 +1,3 @@
+// Shared build settings. Personal signing lives in Local.xcconfig (git-ignored).
+// Copy Local.xcconfig.example → Local.xcconfig and set your DEVELOPMENT_TEAM to run on device.
+#include? "Local.xcconfig"
