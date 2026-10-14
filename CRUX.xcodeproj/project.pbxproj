@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		003958206CAB72D45A8442A2 /* MediaStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3E4A915906942DE3CC2CD3 /* MediaStore.swift */; };
+		09E4A23AD583EB6C5079B4AF /* GymTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BEE13054E7C74C6C06CCF84 /* GymTests.swift */; };
 		0A8CFA00FF8B56601E8686A6 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 577DC4E1DB4E952AF42F0D2A /* Components.swift */; };
 		19CB69C024BAF68AD5B26F6E /* Wall.swift in Sources */ = {isa = PBXBuildFile; fileRef = B735B8860818CF16EFB438AA /* Wall.swift */; };
 		1ABA466130C51665FE2FEF97 /* CameraPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00F2B4B365CA5ECC5A075CF7 /* CameraPicker.swift */; };
@@ -25,6 +26,7 @@
 		5F2A7DF11530E8D0015C466E /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE912301ECF0369ED4931978 /* SessionManager.swift */; };
 		64CC21746BFDCF8090DED62B /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FA2E2E3462D48A0A8887A07 /* LogView.swift */; };
 		7001A536AB2882445E1C7B50 /* ClimbLogCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3520683A09BA3B5ACD85E718 /* ClimbLogCard.swift */; };
+		71FA810395FBCAAEAD54609D /* SettingsComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BB317AE677D93056D34AB66 /* SettingsComponents.swift */; };
 		7CB276B1F717F377256BED7E /* SessionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D09BECF69C09EEA1E8C2E3D /* SessionHeader.swift */; };
 		8054A74BA934038499C80423 /* StyleTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0A6E0A312AF772D1B64DADB /* StyleTag.swift */; };
 		813338465EFA5CFCCE47FECA /* SessionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E98FBD15ABC51A75532BA5 /* SessionManagerTests.swift */; };
@@ -34,6 +36,7 @@
 		97F260519DD104214009E162 /* ClimbPickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98DA918590099E668E5BEA4 /* ClimbPickerSheet.swift */; };
 		9C64449E24593633B220A594 /* CRUXApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED35727C2195A9DAD1B3A4E /* CRUXApp.swift */; };
 		A3F365DF1A7E09E919648CD4 /* Climb+Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = D646F68BB488C3DA3C1029F0 /* Climb+Status.swift */; };
+		AAA3461BB7E3E953AEEF5CCD /* GymSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FA06B2F23E62038622BC4D1 /* GymSwitcher.swift */; };
 		AB5B6555EA454C15C2884DE4 /* WallsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D974D350DA030EDE5A63CC92 /* WallsView.swift */; };
 		ADE59B1738A349B7C1FE5ABE /* HexBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E5C9B69834634BE4353F42 /* HexBadge.swift */; };
 		AF3454FC40BB32E514348E9F /* SessionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EBA8E9061C7B4CB6FFE032B /* SessionDetailView.swift */; };
@@ -43,9 +46,11 @@
 		C15A621D5F45774F19C7E65D /* ClimbFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48BB53C7497953C0801F8A1D /* ClimbFilter.swift */; };
 		C4E2420A16B283E660E98FC6 /* Attempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B8BE3C36DD1E25CD4D2C829 /* Attempt.swift */; };
 		C64D12F32C2F0BD79B515699 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CE8D9B0EE6C38C260D8918F /* SettingsView.swift */; };
+		CED13F1170F47BD0B77BD94E /* GymLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A657D474C3DDDC997D340B56 /* GymLocator.swift */; };
 		D1CE6CF712567CBBB335940C /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74BC59F860C4166DBD3223A /* RootTabView.swift */; };
 		D3A2234782631B6B6FEA8BA9 /* ResetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C0E1641B57BE6A9BD7B474A /* ResetService.swift */; };
 		D3F55F96AA80D2F9BD903B2F /* HoldColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC47AED6BFE5A821CB901EC /* HoldColor.swift */; };
+		D448473DF11F7F692AC49591 /* GymDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66205F040869A9A1DB74B323 /* GymDetailView.swift */; };
 		E20176F52936C11629DD5E61 /* ClimbsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF16213649E5B1771A45CEE /* ClimbsView.swift */; };
 		E3F056D1AE880BC077EB3FF1 /* ClimbSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7611A8C4D2643B40F6303B /* ClimbSession.swift */; };
 		E7A98BDC4FB7604285F0E14F /* GradingAndStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0B9BC93C63B258FF39A63E /* GradingAndStatusTests.swift */; };
@@ -74,6 +79,8 @@
 		0FA2E2E3462D48A0A8887A07 /* LogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
 		1A6EC4A5C91D8E1CC6305982 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		1ACD6AC3F9D42A84D7C57669 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		1BB317AE677D93056D34AB66 /* SettingsComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsComponents.swift; sourceTree = "<group>"; };
+		1BEE13054E7C74C6C06CCF84 /* GymTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymTests.swift; sourceTree = "<group>"; };
 		2457784825FB233CCBF630BD /* SessionConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionConfig.swift; sourceTree = "<group>"; };
 		2D09BECF69C09EEA1E8C2E3D /* SessionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionHeader.swift; sourceTree = "<group>"; };
 		34AF86879A246610EB3B890C /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
@@ -87,17 +94,20 @@
 		4E99EE8A41BE5925CBC7E29A /* Gym.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gym.swift; sourceTree = "<group>"; };
 		577DC4E1DB4E952AF42F0D2A /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		61412AA179114E5C7442EA34 /* HapticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticsService.swift; sourceTree = "<group>"; };
+		66205F040869A9A1DB74B323 /* GymDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymDetailView.swift; sourceTree = "<group>"; };
 		6C0E1641B57BE6A9BD7B474A /* ResetService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetService.swift; sourceTree = "<group>"; };
 		6CF16213649E5B1771A45CEE /* ClimbsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbsView.swift; sourceTree = "<group>"; };
 		6E3B66BE77330CE5ED367F84 /* LogButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogButtons.swift; sourceTree = "<group>"; };
 		716F1E98F38CFAA9727B8737 /* LogCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogCoordinator.swift; sourceTree = "<group>"; };
 		793A63E30C341C980F22FA70 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		7EC47AED6BFE5A821CB901EC /* HoldColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoldColor.swift; sourceTree = "<group>"; };
+		7FA06B2F23E62038622BC4D1 /* GymSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymSwitcher.swift; sourceTree = "<group>"; };
 		8E4EB6EDD2AD7737AAA9D04E /* BetaSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BetaSection.swift; sourceTree = "<group>"; };
 		8EBA8E9061C7B4CB6FFE032B /* SessionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDetailView.swift; sourceTree = "<group>"; };
 		9DFA937F2D4D6A719FED5FEF /* ClimbEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbEditorSheet.swift; sourceTree = "<group>"; };
 		A0A6E0A312AF772D1B64DADB /* StyleTag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleTag.swift; sourceTree = "<group>"; };
 		A37A38476DD88ACC68CCD0BB /* StatsServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsServiceTests.swift; sourceTree = "<group>"; };
+		A657D474C3DDDC997D340B56 /* GymLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymLocator.swift; sourceTree = "<group>"; };
 		A95EF7874B10E737D73992BE /* CRUX.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CRUX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE4CC987D658F58E9F4A9621 /* SeedData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeedData.swift; sourceTree = "<group>"; };
 		B17612B8825F0459EFB64572 /* SessionsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionsListView.swift; sourceTree = "<group>"; };
@@ -167,6 +177,7 @@
 		5CD6B6F751E017A455A687A2 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				1BB317AE677D93056D34AB66 /* SettingsComponents.swift */,
 				3CE8D9B0EE6C38C260D8918F /* SettingsView.swift */,
 			);
 			path = Settings;
@@ -193,11 +204,21 @@
 			isa = PBXGroup;
 			children = (
 				DB0B9BC93C63B258FF39A63E /* GradingAndStatusTests.swift */,
+				1BEE13054E7C74C6C06CCF84 /* GymTests.swift */,
 				C8E98FBD15ABC51A75532BA5 /* SessionManagerTests.swift */,
 				A37A38476DD88ACC68CCD0BB /* StatsServiceTests.swift */,
 				FE9EEF1A8F629E7CDF6DB76B /* TestSupport.swift */,
 			);
 			path = CRUXTests;
+			sourceTree = "<group>";
+		};
+		86C7B847BDE200A9368CCCE0 /* Gyms */ = {
+			isa = PBXGroup;
+			children = (
+				66205F040869A9A1DB74B323 /* GymDetailView.swift */,
+				7FA06B2F23E62038622BC4D1 /* GymSwitcher.swift */,
+			);
+			path = Gyms;
 			sourceTree = "<group>";
 		};
 		909E5915BBA639E7F21841F2 /* Models */ = {
@@ -263,6 +284,7 @@
 			children = (
 				DB94DF4F45E96DFEBB142989 /* Beta */,
 				D2F60ABEDF6F995E547CBE06 /* Climbs */,
+				86C7B847BDE200A9368CCCE0 /* Gyms */,
 				B66DD6025C65DF3E6D478DAB /* Log */,
 				2513268B8BBF8A5B63C53DCC /* Session */,
 				5CD6B6F751E017A455A687A2 /* Settings */,
@@ -275,6 +297,7 @@
 		CF6B2398C59AA33A4516EA09 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				A657D474C3DDDC997D340B56 /* GymLocator.swift */,
 				DC3E4A915906942DE3CC2CD3 /* MediaStore.swift */,
 				6C0E1641B57BE6A9BD7B474A /* ResetService.swift */,
 				AE4CC987D658F58E9F4A9621 /* SeedData.swift */,
@@ -418,6 +441,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E7A98BDC4FB7604285F0E14F /* GradingAndStatusTests.swift in Sources */,
+				09E4A23AD583EB6C5079B4AF /* GymTests.swift in Sources */,
 				813338465EFA5CFCCE47FECA /* SessionManagerTests.swift in Sources */,
 				EA3195E45383C6B0597FE419 /* StatsServiceTests.swift in Sources */,
 				F5EACA4131567ADE4313B51C /* TestSupport.swift in Sources */,
@@ -446,6 +470,9 @@
 				E20176F52936C11629DD5E61 /* ClimbsView.swift in Sources */,
 				0A8CFA00FF8B56601E8686A6 /* Components.swift in Sources */,
 				BAEB433E603AC056FFC2F990 /* Gym.swift in Sources */,
+				D448473DF11F7F692AC49591 /* GymDetailView.swift in Sources */,
+				CED13F1170F47BD0B77BD94E /* GymLocator.swift in Sources */,
+				AAA3461BB7E3E953AEEF5CCD /* GymSwitcher.swift in Sources */,
 				43885802A4B9932A3B7CA456 /* HapticsService.swift in Sources */,
 				ADE59B1738A349B7C1FE5ABE /* HexBadge.swift in Sources */,
 				40401FC006282322DECA9F22 /* HexGrade.swift in Sources */,
@@ -463,6 +490,7 @@
 				7CB276B1F717F377256BED7E /* SessionHeader.swift in Sources */,
 				5F2A7DF11530E8D0015C466E /* SessionManager.swift in Sources */,
 				454A95F58E35A6AE41B7B94F /* SessionsListView.swift in Sources */,
+				71FA810395FBCAAEAD54609D /* SettingsComponents.swift in Sources */,
 				C64D12F32C2F0BD79B515699 /* SettingsView.swift in Sources */,
 				3472CFA8734009C8B9542D24 /* StatsService.swift in Sources */,
 				3577DD1A7FF7E3C549B5D29D /* StatsView.swift in Sources */,
@@ -496,6 +524,7 @@
 				INFOPLIST_FILE = CRUX/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = CRUX.;
 				INFOPLIST_KEY_NSCameraUsageDescription = "CRUX. uses the camera to record beta videos and photos of your climbs.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "CRUX. checks your location when you open it to switch to the gym you're at. It never leaves your iPhone.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "CRUX. records audio with your beta videos.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "CRUX. attaches photos and videos from your library as beta for a climb.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -522,6 +551,7 @@
 				INFOPLIST_FILE = CRUX/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = CRUX.;
 				INFOPLIST_KEY_NSCameraUsageDescription = "CRUX. uses the camera to record beta videos and photos of your climbs.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "CRUX. checks your location when you open it to switch to the gym you're at. It never leaves your iPhone.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "CRUX. records audio with your beta videos.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "CRUX. attaches photos and videos from your library as beta for a climb.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

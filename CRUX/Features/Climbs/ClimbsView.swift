@@ -45,8 +45,9 @@ struct ClimbsView: View {
             .navigationTitle("Climbs")
             .searchable(text: $query, prompt: "Search climbs")
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) { sortMenu }
+                ToolbarItem(placement: .topBarLeading) { GymSwitcher() }
                 ToolbarItemGroup(placement: .topBarTrailing) {
+                    sortMenu
                     Button("New climb", systemImage: "plus") { showingNewClimb = true }
                     SettingsToolbarButton()
                 }

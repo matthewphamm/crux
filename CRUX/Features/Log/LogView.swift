@@ -41,6 +41,7 @@ struct LogView: View {
             .nightGymBackground()
             .navigationTitle("CRUX.")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) { GymSwitcher() }
                 ToolbarItem(placement: .topBarTrailing) { SettingsToolbarButton() }
             }
             .logToast()

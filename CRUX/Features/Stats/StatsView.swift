@@ -8,6 +8,8 @@ struct StatsView: View {
     @Query private var allClimbs: [Climb]
     @Query(sort: \ClimbSession.startedAt, order: .reverse) private var allSessions: [ClimbSession]
     @AppStorage("stats.range") private var range: StatsRange = .days90
+    @AppStorage("stats.allGyms") private var allGyms = false
+    @Query(sort: \Gym.createdAt) private var gyms: [Gym]
 
     @State private var pyramidSelection: String?
     @State private var timeSelection: Date?
@@ -34,6 +36,7 @@ struct StatsView: View {
                         overTimeCard
                         averageTriesCard
                     }
+                    if allGyms && gyms.count > 1 { byGymCard }
                     if !insights.isEmpty { insightsCard }
                     if !styles.isEmpty { styleCard }
                     sessionsLink
@@ -43,7 +46,10 @@ struct StatsView: View {
             }
             .nightGymBackground()
             .navigationTitle("Progress")
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { SettingsToolbarButton() } }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) { GymSwitcher(allGyms: $allGyms) }
+                ToolbarItem(placement: .topBarTrailing) { SettingsToolbarButton() }
+            }
             .navigationDestination(for: ClimbSession.self) { SessionDetailView(session: $0) }
             .navigationDestination(for: SessionsRoute.self) { _ in SessionsListView(sessions: gymSessions) }
             .cruxFeedback(.selection, trigger: range)
@@ -54,9 +60,9 @@ struct StatsView: View {
 
     private var now: Date { .now }
     private var start: Date? { range.startDate(from: now) }
-    private var climbs: [Climb] { allClimbs.inGym(app.currentGym) }
+    private var climbs: [Climb] { allGyms ? allClimbs : allClimbs.inGym(app.currentGym) }
     private var gymSessions: [ClimbSession] {
-        allSessions.filter { !$0.isOpen && $0.gym?.id == app.currentGym?.id && !($0.attempts ?? []).isEmpty }
+        allSessions.filter { !$0.isOpen && (allGyms || $0.gym?.id == app.currentGym?.id) && !($0.attempts ?? []).isEmpty }
     }
     private var tops: [Top] { StatsService.tops(from: climbs, since: start) }
     private var insights: [Insight] { StatsService.insights(climbs, since: start) }
@@ -272,6 +278,35 @@ struct StatsView: View {
                 }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel("\(stat.tag.name): \(stat.sent) of \(stat.tried) sent")
+            }
+        }
+        .glassCard()
+    }
+
+    /// In All-gyms mode: how each location contributes.
+    private var byGymCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionHeader(title: "By gym", trailing: "tops · sessions")
+            ForEach(gyms) { gym in
+                let gymTops = StatsService.tops(from: allClimbs.inGym(gym), since: start)
+                let sessionCount = gymSessions.filter { $0.gym?.id == gym.id && (start == nil || $0.startedAt >= start!) }.count
+                HStack(spacing: 12) {
+                    if let best = StatsService.maxGrade(gymTops) {
+                        HexBadge(grade: HexGrade(clamping: best), color: .black, size: 30, glowing: true)
+                    } else {
+                        Hexagon().stroke(Theme.inkTertiary, lineWidth: 1).frame(width: 30, height: 30)
+                    }
+                    Text(gym.name)
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(Theme.ink)
+                        .lineLimit(1)
+                    Spacer()
+                    Text("\(gymTops.count) · \(sessionCount)")
+                        .font(.number(.subheadline))
+                        .foregroundStyle(Theme.inkSecondary)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("\(gym.name): \(gymTops.count) tops, \(sessionCount) sessions")
             }
         }
         .glassCard()

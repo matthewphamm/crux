@@ -6,6 +6,7 @@ enum AppTab: Hashable {
 }
 
 struct RootTabView: View {
+    @Environment(AppModel.self) private var app
     @Environment(SessionManager.self) private var sessions
     @Environment(LogCoordinator.self) private var logger
     @Environment(\.scenePhase) private var scenePhase
@@ -29,7 +30,9 @@ struct RootTabView: View {
         .tabBarMinimizeBehavior(.onScrollDown)
         .logFeedback(logger)
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active { sessions.refresh() }
+            guard phase == .active else { return }
+            sessions.refresh()
+            Task { await detectGym() }
         }
         .task {
             HapticsService.shared.prepare()
@@ -40,9 +43,13 @@ struct RootTabView: View {
         }
     }
 
-    #if DEBUG
-    @Environment(AppModel.self) private var app
+    /// Auto-switch to the gym you've just walked into (when enabled and no session is running).
+    private func detectGym() async {
+        guard let gym = await app.autoDetectGym() else { return }
+        logger.show(Toast(message: "You're at \(gym.name)", symbol: "location.fill", tint: Theme.accent, undo: false))
+    }
 
+    #if DEBUG
     /// Debug-only hooks for screenshots and UI checks:
     /// `-seedSampleData` loads sample history, `-demoSession` logs a few tries now,
     /// `-tab climbs|walls|stats` opens a tab.

@@ -33,8 +33,9 @@ struct WallsView: View {
                 .animation(Theme.spring, value: walls.map(\.id))
             }
             .nightGymBackground()
-            .navigationTitle(app.currentGym?.name ?? "Walls")
+            .navigationTitle("Walls")
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) { GymSwitcher() }
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button("New wall", systemImage: "plus") { showingNewWall = true }
                     SettingsToolbarButton()
