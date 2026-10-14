@@ -1,3 +1,4 @@
+import SwiftData
 import SwiftUI
 
 enum AppTab: Hashable {
@@ -32,9 +33,42 @@ struct RootTabView: View {
         }
         .task {
             HapticsService.shared.prepare()
+            #if DEBUG
+            applyLaunchArguments()
+            #endif
             await watchSessionTimeout()
         }
     }
+
+    #if DEBUG
+    @Environment(AppModel.self) private var app
+
+    /// Debug-only hooks for screenshots and UI checks:
+    /// `-seedSampleData` loads sample history, `-demoSession` logs a few tries now,
+    /// `-tab climbs|walls|stats` opens a tab.
+    private func applyLaunchArguments() {
+        let defaults = UserDefaults.standard
+        if defaults.bool(forKey: "seedSampleData"), let gym = app.currentGym {
+            SeedData.loadSample(into: gym, context: app.context)
+            sessions.refresh()
+        }
+        if defaults.bool(forKey: "demoSession") {
+            let unsent = (try? app.context.fetch(FetchDescriptor<Climb>()))?
+                .filter { $0.isActive && !$0.hasSent }
+                .sorted { $0.gradeValue < $1.gradeValue } ?? []
+            for (index, climb) in unsent.prefix(3).enumerated() {
+                for _ in 0..<(index + 1) { sessions.log(.attempt, on: climb) }
+                if index == 0 { sessions.log(.send, on: climb) }
+            }
+        }
+        switch defaults.string(forKey: "tab") {
+        case "climbs": tab = .climbs
+        case "walls": tab = .walls
+        case "stats": tab = .stats
+        default: break
+        }
+    }
+    #endif
 
     /// While the app is open, close the session the moment its idle timeout passes.
     private func watchSessionTimeout() async {

@@ -97,7 +97,14 @@ struct LogView: View {
             .controlSize(.large)
         }
         .padding(.horizontal, Theme.Spacing.gutter)
+        .padding(.top, 20)
         .padding(.bottom, 8)
+        .background(alignment: .bottom) {
+            // Soft fade so cards scrolling underneath don't compete with the buttons.
+            LinearGradient(colors: [Theme.background.opacity(0), Theme.background.opacity(0.9)], startPoint: .top, endPoint: .bottom)
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+        }
     }
 
     private var emptyState: some View {
@@ -134,8 +141,8 @@ struct LogView: View {
     private var tickList: [Climb] {
         let shown = Set(sessionClimbs.map(\.id))
         return gymClimbs
-            .filter { $0.isOnTickList && !shown.contains($0.id) }
-            .sorted { ($0.hasSent ? 1 : 0, -$0.gradeValue) < ($1.hasSent ? 1 : 0, -$1.gradeValue) }
+            .filter { $0.isOnTickList && !$0.hasSent && !shown.contains($0.id) }
+            .sorted { $0.gradeValue > $1.gradeValue }
     }
 
     /// The newest unsent problems, so the next climb is usually one tap away.

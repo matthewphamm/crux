@@ -10,15 +10,15 @@ enum SeedData {
         var rng = SeededGenerator(seed: 383)
         let calendar = Calendar.current
 
-        let wallSpecs: [(String, [StyleTag])] = [
-            ("Cave", [.overhang, .roof, .jugs, .compression, .dyno]),
-            ("Slab", [.slab, .technical, .crimpy, .mantle]),
-            ("Overhang", [.overhang, .pinchy, .compression, .slopey]),
-            ("Comp wall", [.coordination, .dyno, .vertical, .slopey]),
+        // (name, tags, days ago the current set went up — nil means it predates the sample window)
+        let wallSpecs: [(String, [StyleTag], Int?)] = [
+            ("Cave", [.overhang, .roof, .jugs, .compression, .dyno], 38),
+            ("Slab", [.slab, .technical, .crimpy, .mantle], 9),
+            ("Overhang", [.overhang, .pinchy, .compression, .slopey], nil),
+            ("Comp wall", [.coordination, .dyno, .vertical, .slopey], 24),
         ]
 
         let start = calendar.date(byAdding: .day, value: -70, to: now)!
-        let compReset = calendar.date(byAdding: .day, value: -24, to: now)!
 
         var available: [(climb: Climb, from: Date, until: Date?)] = []
 
@@ -27,8 +27,8 @@ enum SeedData {
             context.insert(wall)
             wall.gym = gym
 
-            let isComp = spec.0 == "Comp wall"
-            let batches: [(Date, Date?)] = isComp ? [(start, compReset), (compReset, nil)] : [(start, nil)]
+            let resetDate = spec.2.flatMap { calendar.date(byAdding: .day, value: -$0, to: now) }
+            let batches: [(Date, Date?)] = resetDate.map { [(start, $0), ($0, nil)] } ?? [(start, nil)]
             for (from, until) in batches {
                 for _ in 0..<9 {
                     let climb = makeClimb(tags: spec.1, created: from, rng: &rng)
@@ -38,11 +38,11 @@ enum SeedData {
                     available.append((climb, from, until))
                 }
             }
-            if isComp {
-                let reset = WallReset(date: compReset, note: "Comp set", strippedCount: 9)
+            if let resetDate {
+                let reset = WallReset(date: resetDate, note: spec.0 == "Comp wall" ? "Comp set" : "", strippedCount: 9)
                 context.insert(reset)
                 reset.wall = wall
-                wall.lastResetAt = compReset
+                wall.lastResetAt = resetDate
             } else {
                 wall.lastResetAt = start
             }
@@ -111,7 +111,7 @@ enum SeedData {
     }
 
     private static func sendChance(_ climb: Climb, level: Double, priorTries: Int) -> Double {
-        var chance = 0.55 + (level - Double(climb.gradeValue)) * 0.28 + Double(priorTries) * 0.08
+        var chance = 0.3 + (level - Double(climb.gradeValue)) * 0.22 + Double(min(priorTries, 4)) * 0.06
         if climb.styleTags.contains(.slab) { chance -= 0.3 }
         if climb.styleTags.contains(.overhang) { chance += 0.12 }
         return min(max(chance, 0.02), 0.95)
