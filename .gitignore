@@ -1,0 +1,14 @@
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+.build/
+*.xcscmblueprint
+*.xccheckout
+
+# Local signing (contains DEVELOPMENT_TEAM)
+Config/Local.xcconfig
+
+# macOS
+.DS_Store
