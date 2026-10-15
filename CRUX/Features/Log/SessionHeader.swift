@@ -64,7 +64,7 @@ struct SessionHeader: View {
             Text("Ready when you are")
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(Theme.ink)
-            Text("A session starts with your first log and wraps itself up after \(timeoutText) of quiet.")
+            Text("Tap + to start a session. It ends when you tap End, or after \(timeoutText) without a log.")
                 .font(.subheadline)
                 .foregroundStyle(Theme.inkSecondary)
                 .fixedSize(horizontal: false, vertical: true)

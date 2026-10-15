@@ -59,6 +59,23 @@ final class SessionManager {
         save()
     }
 
+    /// Climbs added to the running session that haven't been logged yet, newest first.
+    private(set) var queuedClimbIDs: [UUID] = []
+
+    /// Starts a session now (from the + button), or returns the one already running.
+    @discardableResult
+    func startSession() -> ClimbSession {
+        let session = sessionForLogging(at: clock()).0
+        save()
+        return session
+    }
+
+    /// Puts a climb on the running session's list before its first log.
+    func queue(_ climb: Climb) {
+        queuedClimbIDs.removeAll { $0 == climb.id }
+        queuedClimbIDs.insert(climb.id, at: 0)
+    }
+
     /// Time until the active session would auto-close, used to schedule the next check.
     var timeUntilAutoClose: TimeInterval? {
         guard let activeSession else { return nil }
@@ -85,6 +102,7 @@ final class SessionManager {
     }
 
     private func close(_ session: ClimbSession, at date: Date) {
+        queuedClimbIDs = []
         if (session.attempts ?? []).isEmpty {
             context.delete(session)
         } else {

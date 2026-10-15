@@ -20,8 +20,21 @@ final class LogCoordinator {
     /// Incremented per climb to play the HexBadge glow bloom.
     private(set) var bloom: [UUID: Int] = [:]
 
+    /// Drives the full-screen live session (the + button in the tab bar).
+    var isSessionPresented = false
+    private(set) var startTick = 0
+
     init(sessions: SessionManager) {
         self.sessions = sessions
+    }
+
+    /// Starts a session if none is running, then shows it.
+    func openSession() {
+        if sessions.activeSession == nil {
+            withAnimation(Theme.spring) { sessions.startSession() }
+            startTick += 1
+        }
+        isSessionPresented = true
     }
 
     func log(_ outcome: AttemptOutcome, on climb: Climb, sendType: SendType? = nil) {
@@ -74,6 +87,7 @@ extension View {
     /// Everyday haptics for logging, attached once at the root.
     func logFeedback(_ logger: LogCoordinator) -> some View {
         self
+            .cruxFeedback(.impact(weight: .medium), trigger: logger.startTick)
             .cruxFeedback(.impact(weight: .light), trigger: logger.attemptTick)
             .cruxFeedback(.success, trigger: logger.sendTick)
             .cruxFeedback(.impact(weight: .medium), trigger: logger.flashTick)

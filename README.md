@@ -14,16 +14,12 @@ It's built around the **Hex grading system** used at [Hive Climbing](https://hiv
 ## Features
 
 **Logging at the wall**
-- One-handed **Quick log**: big **+ Attempt** and **Send** buttons on every climb card.
-- **Send-type inference**:
-  - A send on the first try is a *flash*.
-  - A send after failed tries is a *send*.
-  - A send after an earlier send is a *repeat*.
-  - Long-press to override.
+- **Start session** from the bar above the tab bar. It opens a full-screen live session, and while you're climbing the bar shows the running clock.
+- Inside a session, add problems **from the wall** or create a **new climb**. Each one gets big **+ Attempt** and **Send** buttons.
+- **Send-type inference**: a send on the first try is a *flash*, a send after failed tries is a *send*, and a send after an earlier send is a *repeat*. Long-press the send button to choose a different one.
 - A four-second **undo** toast for every log.
-- **Automatic sessions**:
-  - The first log starts a session.
-  - The session closes itself after a configurable quiet period, timed from your last log.
+- **End** shows a summary straight away. Sessions also wrap up on their own after a configurable quiet period, timed from your last log.
+- **Multiple gyms** (e.g. Hive Vancouver, Surrey, Port Coquitlam), with a quick switcher and optional location-based auto-switching that never leaves the device.
 
 **Organizing**
 - **Tick list, Projects, All and Stripped** views, with grade-range, wall, hold color, status and style filters.

@@ -279,8 +279,8 @@ enum StatsService {
         let label = previous.count == 1 ? "your last session" : "your last \(previous.count) sessions"
         switch delta {
         case 0: return "Right on your average for \(label)"
-        case let d where d > 0: return "+\(d) sends vs \(label)"
-        default: return "\(delta) sends vs \(label)"
+        case let d where d > 0: return "+\(d) \(d == 1 ? "send" : "sends") vs \(label)"
+        default: return "\(delta) \(delta == -1 ? "send" : "sends") vs \(label)"
         }
     }
 }

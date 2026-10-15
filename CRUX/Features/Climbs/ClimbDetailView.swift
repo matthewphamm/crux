@@ -15,10 +15,12 @@ struct ClimbDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Theme.Spacing.section) {
                 hero
-                if climb.isActive {
+                if !climb.isActive {
+                    strippedNotice
+                } else if sessions.activeSession != nil {
                     LogButtons(climb: climb)
                 } else {
-                    strippedNotice
+                    startPrompt
                 }
                 stats
                 BetaSection(climb: climb)
@@ -82,6 +84,20 @@ struct ClimbDetailView: View {
         }
         .padding(.top, 8)
         .animation(Theme.spring, value: climb.status)
+    }
+
+    /// Logging lives in sessions; outside one, offer to start it right here.
+    private var startPrompt: some View {
+        Button {
+            logger.openSession()
+            sessions.queue(climb)
+        } label: {
+            Label("Start a session with this climb", systemImage: "plus")
+                .font(.body.weight(.semibold))
+                .frame(maxWidth: .infinity, minHeight: 30)
+        }
+        .buttonStyle(.glassProminent)
+        .controlSize(.large)
     }
 
     private var strippedNotice: some View {

@@ -245,6 +245,11 @@ enum Format {
         seconds < 60 ? "\(Int(seconds)) sec" : "\(Int(seconds / 60)) min"
     }
 
+    /// "1 send", "3 sends".
+    static func count(_ value: Int, _ noun: String) -> String {
+        "\(value) \(noun)\(value == 1 ? "" : "s")"
+    }
+
     static func percent(_ value: Double?) -> String {
         guard let value else { return "—" }
         return "\(Int((value * 100).rounded()))%"

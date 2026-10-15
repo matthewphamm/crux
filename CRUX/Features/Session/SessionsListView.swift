@@ -62,7 +62,7 @@ struct SessionRow: View {
                 Text(session.startedAt.formatted(.dateTime.weekday(.wide).month(.abbreviated).day()))
                     .font(.headline)
                     .foregroundStyle(Theme.ink)
-                Text("\(Format.duration(stats.duration)) · \(stats.attempts) attempts · \(stats.sends) sends")
+                Text("\(Format.duration(stats.duration)) · \(Format.count(stats.attempts, "attempt")) · \(Format.count(stats.sends, "send"))")
                     .font(.subheadline)
                     .foregroundStyle(Theme.inkSecondary)
             }

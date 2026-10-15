@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 enum AppTab: Hashable {
-    case log, climbs, walls, stats
+    case home, climbs, walls, stats
 }
 
 struct RootTabView: View {
@@ -10,12 +10,13 @@ struct RootTabView: View {
     @Environment(SessionManager.self) private var sessions
     @Environment(LogCoordinator.self) private var logger
     @Environment(\.scenePhase) private var scenePhase
-    @State private var tab: AppTab = .log
+    @State private var tab: AppTab = .home
 
     var body: some View {
+        @Bindable var logger = logger
         TabView(selection: $tab) {
-            Tab("Log", systemImage: "hexagon.fill", value: .log) {
-                LogView()
+            Tab("Home", systemImage: "hexagon.fill", value: .home) {
+                HomeView()
             }
             Tab("Climbs", systemImage: "list.bullet.rectangle", value: .climbs) {
                 ClimbsView()
@@ -26,6 +27,10 @@ struct RootTabView: View {
             Tab("Stats", systemImage: "chart.bar.xaxis", value: .stats) {
                 StatsView()
             }
+        }
+        .tabViewBottomAccessory { SessionAccessory() }
+        .fullScreenCover(isPresented: $logger.isSessionPresented) {
+            LiveSessionView()
         }
         .tabBarMinimizeBehavior(.onScrollDown)
         .logFeedback(logger)
