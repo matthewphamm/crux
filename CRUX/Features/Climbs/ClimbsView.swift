@@ -27,6 +27,8 @@ struct ClimbsView: View {
 
                     if filter.sheetFilterCount > 0 { activeSummary }
 
+                    if segment == .stripped && !results.isEmpty { strippedNote }
+
                     LazyVStack(spacing: 10) {
                         ForEach(results) { climb in
                             NavigationLink(value: climb) {
@@ -162,6 +164,22 @@ struct ClimbsView: View {
         return (walls + statuses + colors + tags).joined(separator: " · ")
     }
 
+    private var strippedNote: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "archivebox.fill")
+                .foregroundStyle(Theme.stripped)
+            Text("No longer on the wall. Their logs, beta and stats are kept.")
+                .font(.footnote)
+                .foregroundStyle(Theme.inkSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.stripped.opacity(0.10), in: .rect(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Theme.stripped.opacity(0.25), lineWidth: 1))
+    }
+
     // MARK: Empty
 
     private var empty: some View {
@@ -199,30 +217,71 @@ struct ClimbRow: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            HexBadge(grade: climb.grade, color: climb.holdColor, size: 44, glowing: climb.status.isTopped)
+            HexBadge(grade: climb.grade, color: climb.holdColor, size: 44, glowing: climb.isActive && climb.status.isTopped)
+                .saturation(climb.isActive ? 1 : 0)
+                .opacity(climb.isActive ? 1 : 0.55)
             VStack(alignment: .leading, spacing: 3) {
                 Text(climb.displayName)
                     .font(.headline)
-                    .foregroundStyle(Theme.ink)
+                    .foregroundStyle(climb.isActive ? Theme.ink : Theme.inkSecondary)
                     .lineLimit(1)
                 Text(subtitle)
                     .font(.subheadline)
-                    .foregroundStyle(Theme.inkSecondary)
+                    .foregroundStyle(climb.isActive ? Theme.inkSecondary : Theme.inkTertiary)
                     .lineLimit(1)
             }
             Spacer(minLength: 8)
             VStack(alignment: .trailing, spacing: 3) {
-                StatusLabel(status: climb.status)
-                Text(climb.tryCount == 1 ? "1 try" : "\(climb.tryCount) tries")
-                    .font(.caption)
-                    .foregroundStyle(Theme.inkTertiary)
+                if let strippedAt = climb.strippedAt {
+                    StrippedTag(date: strippedAt)
+                    Text("\(climb.status.name) · \(climb.tryCount == 1 ? "1 try" : "\(climb.tryCount) tries")")
+                        .font(.caption)
+                        .foregroundStyle(Theme.inkTertiary)
+                } else {
+                    StatusLabel(status: climb.status)
+                    Text(climb.tryCount == 1 ? "1 try" : "\(climb.tryCount) tries")
+                        .font(.caption)
+                        .foregroundStyle(Theme.inkTertiary)
+                }
             }
         }
-        .glassCard(padding: 14)
+        .glassCard(padding: 14, tint: climb.isActive ? nil : Theme.stripped.opacity(0.4))
+        .overlay(alignment: .leading) {
+            if !climb.isActive {
+                Capsule()
+                    .fill(Theme.stripped)
+                    .frame(width: 3)
+                    .padding(.vertical, 18)
+                    .padding(.leading, 5)
+                    .accessibilityHidden(true)
+            }
+        }
         .accessibilityElement(children: .combine)
     }
 
     private var subtitle: String {
         [climb.grade.vRange, climb.wall?.name].compactMap(\.self).joined(separator: " · ")
+    }
+}
+
+/// Red "Stripped · Oct 9" marker for climbs that are off the wall.
+struct StrippedTag: View {
+    let date: Date
+
+    var body: some View {
+        Label {
+            Text("Stripped · \(date.formatted(.dateTime.month(.abbreviated).day()))")
+        } icon: {
+            Image(systemName: "archivebox.fill")
+        }
+        .font(.caption.weight(.semibold))
+        .foregroundStyle(Theme.stripped)
+        .labelStyle(.titleAndIcon)
+        .lineLimit(1)
+        .fixedSize()
+        .padding(.horizontal, 8)
+        .padding(.vertical, 3)
+        .background(Theme.stripped.opacity(0.14), in: .capsule)
+        .accessibilityLabel("Stripped on \(date.formatted(date: .long, time: .omitted))")
     }
 }

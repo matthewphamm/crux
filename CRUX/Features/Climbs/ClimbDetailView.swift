@@ -33,6 +33,7 @@ struct ClimbDetailView: View {
         .navigationTitle(climb.displayName)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            if climb.isActive {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(climb.isProjectFlagged ? "Unstar project" : "Star as project",
                        systemImage: climb.isProjectFlagged ? "star.fill" : "star") {
@@ -40,6 +41,7 @@ struct ClimbDetailView: View {
                     try? context.save()
                 }
                 .symbolEffect(.bounce, value: climb.isProjectFlagged)
+            }
             }
             ToolbarItem(placement: .topBarTrailing) { moreMenu }
         }
@@ -62,9 +64,11 @@ struct ClimbDetailView: View {
                 grade: climb.grade,
                 color: climb.holdColor,
                 size: 84,
-                glowing: climb.status.isTopped,
+                glowing: climb.isActive && climb.status.isTopped,
                 bloom: logger.bloom[climb.id] ?? 0
             )
+            .saturation(climb.isActive ? 1 : 0)
+            .opacity(climb.isActive ? 1 : 0.6)
             VStack(alignment: .leading, spacing: 6) {
                 Text(climb.grade.fullLabel)
                     .font(.title3.weight(.semibold))
@@ -101,14 +105,21 @@ struct ClimbDetailView: View {
     }
 
     private var strippedNotice: some View {
-        Label {
-            Text("Stripped \(climb.strippedAt?.formatted(date: .abbreviated, time: .omitted) ?? "") — history kept.")
-        } icon: {
-            Image(systemName: "archivebox")
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "archivebox.fill")
+                .font(.title3)
+                .foregroundStyle(Theme.stripped)
+            VStack(alignment: .leading, spacing: 3) {
+                Text("Stripped \(climb.strippedAt?.formatted(date: .abbreviated, time: .omitted) ?? "")")
+                    .font(.headline)
+                    .foregroundStyle(Theme.stripped)
+                Text("This problem is no longer on the wall. Its logs and beta are kept. If it's back up, use ⋯ → Restore to wall.")
+                    .font(.subheadline)
+                    .foregroundStyle(Theme.inkSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
-        .font(.subheadline)
-        .foregroundStyle(Theme.inkSecondary)
-        .glassCard(padding: 14)
+        .glassCard(padding: 16, tint: Theme.stripped.opacity(0.6))
     }
 
     private var stats: some View {

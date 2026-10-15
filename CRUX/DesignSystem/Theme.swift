@@ -13,6 +13,8 @@ enum Theme {
     /// A soft amber, like chalk under warm gym lights. The only accent.
     static let accent = Color(light: 0xB8761F, dark: 0xF2B45A)
     static let send = Color(light: 0x2F8F5B, dark: 0x5CC98C)
+    /// Soft red for climbs that are no longer on the wall.
+    static let stripped = Color(light: 0xC2413A, dark: 0xE5675F)
 
     enum Radius {
         static let card: CGFloat = 26
