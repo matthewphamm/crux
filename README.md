@@ -43,7 +43,7 @@ It's built around the **Hex grading system** used at [Hive Climbing](https://hiv
 - **Beta**: notes, plus photos and videos from the library or camera. Videos appear on the session timeline.
 
 **Feel**
-- A *Night Gym* design: dark-first, iOS 26 Liquid Glass, and a hexagon tag tinted with the hold color that shows the grade as 1–7 small hexes, like the tags on Hive's walls.
+- A *Night Gym* design: dark-first, iOS 26 Liquid Glass, and a hexagon tag tinted with the hold color that shows the grade like Hive's wall tags: a ring of six hexes filled in one per grade, with a centre hex for 7.
 - Subtle springs, numeric content transitions, zoom navigation transitions, and Reduce Motion fallbacks.
 - Haptics throughout, plus a custom **Core Haptics** pattern when you finish a project: three rising taps, then a warm swell.
 
