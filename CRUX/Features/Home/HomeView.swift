@@ -31,7 +31,7 @@ struct HomeView: View {
 
                     if !projects.isEmpty {
                         VStack(alignment: .leading, spacing: Theme.Spacing.stack) {
-                            SectionHeader(title: "Current projects", trailing: "\(projects.count)")
+                            SectionHeader(title: "Projects", trailing: "\(projects.count)")
                             ForEach(projects) { climb in
                                 NavigationLink(value: climb) {
                                     ClimbRow(climb: climb)
