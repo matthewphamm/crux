@@ -1,7 +1,6 @@
 import Foundation
 
 enum ClimbSegment: String, CaseIterable, Identifiable {
-    case tickList = "Tick list"
     case projects = "Projects"
     case all = "All"
     case stripped = "Stripped"
@@ -43,7 +42,6 @@ struct ClimbFilter: Equatable {
         let q = query.lowercased().trimmingCharacters(in: .whitespaces)
         let inSegment = climbs.filter { climb in
             switch segment {
-            case .tickList: climb.isActive && climb.isOnTickList
             case .projects: climb.isActive && climb.status == .project
             case .all: climb.isActive
             case .stripped: !climb.isActive

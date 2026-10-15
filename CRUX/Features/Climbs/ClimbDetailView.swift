@@ -34,12 +34,12 @@ struct ClimbDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button(climb.isOnTickList ? "Remove from tick list" : "Add to tick list",
-                       systemImage: climb.isOnTickList ? "bookmark.fill" : "bookmark") {
-                    withAnimation(Theme.spring) { climb.isOnTickList.toggle() }
+                Button(climb.isProjectFlagged ? "Unstar project" : "Star as project",
+                       systemImage: climb.isProjectFlagged ? "star.fill" : "star") {
+                    withAnimation(Theme.spring) { climb.isProjectFlagged.toggle() }
                     try? context.save()
                 }
-                .symbolEffect(.bounce, value: climb.isOnTickList)
+                .symbolEffect(.bounce, value: climb.isProjectFlagged)
             }
             ToolbarItem(placement: .topBarTrailing) { moreMenu }
         }
@@ -50,7 +50,6 @@ struct ClimbDetailView: View {
         } message: {
             Text("All \(climb.tryCount) logs and any beta media will be removed. To keep history, strip it instead.")
         }
-        .cruxFeedback(.selection, trigger: climb.isOnTickList)
         .cruxFeedback(.selection, trigger: climb.isProjectFlagged)
     }
 
@@ -164,12 +163,6 @@ struct ClimbDetailView: View {
     private var moreMenu: some View {
         Menu {
             Button("Edit", systemImage: "pencil") { editing = true }
-            Toggle(isOn: Binding(
-                get: { climb.isProjectFlagged },
-                set: { climb.isProjectFlagged = $0; try? context.save() }
-            )) {
-                Label("Project", systemImage: "star")
-            }
             Divider()
             if climb.isActive {
                 Button("Strip from wall", systemImage: "archivebox") {

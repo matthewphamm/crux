@@ -23,7 +23,6 @@ struct ClimbEditorSheet: View {
     @State private var name = ""
     @State private var notes = ""
     @State private var tags: Set<StyleTag> = []
-    @State private var onTickList = false
     @State private var isProject = false
     @State private var mediaItems: [PhotosPickerItem] = []
     @State private var newWallName = ""
@@ -206,9 +205,7 @@ struct ClimbEditorSheet: View {
                     .lineLimit(2...6)
                     .padding(.vertical, 12)
                 Divider().overlay(Theme.hairline)
-                Toggle("On my tick list", isOn: $onTickList)
-                    .padding(.vertical, 8)
-                Toggle("Mark as project", isOn: $isProject)
+                Toggle(isOn: $isProject) { Label("Project", systemImage: "star") }
                     .padding(.vertical, 8)
             }
             .glassCard(padding: 16)
@@ -265,7 +262,6 @@ struct ClimbEditorSheet: View {
             name = climb.name
             notes = climb.notes
             tags = climb.styleTags
-            onTickList = climb.isOnTickList
             isProject = climb.isProjectFlagged
         }
     }
@@ -292,7 +288,6 @@ struct ClimbEditorSheet: View {
         climb.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
         climb.notes = notes
         climb.styleTags = tags
-        climb.isOnTickList = onTickList
         climb.isProjectFlagged = isProject
         climb.wall = walls.first { $0.id == wallID }
         if let wallID { lastWallID = wallID.uuidString }

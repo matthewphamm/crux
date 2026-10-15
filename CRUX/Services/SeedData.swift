@@ -86,9 +86,8 @@ enum SeedData {
 
         // A few things to look forward to.
         let unsent = available.map(\.climb).filter { $0.isActive && !$0.hasSent }
-        for climb in unsent.prefix(4) { climb.isOnTickList = true }
+        for climb in unsent.prefix(3) { climb.isProjectFlagged = true }
         unsent.dropFirst(4).first?.isProjectFlagged = true
-        for climb in available.map(\.climb).filter({ $0.isActive && $0.hasSent }).prefix(2) { climb.isOnTickList = true }
 
         try? context.save()
     }

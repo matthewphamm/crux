@@ -29,10 +29,10 @@ struct HomeView: View {
                         startCard
                     }
 
-                    if !tickList.isEmpty {
+                    if !projects.isEmpty {
                         VStack(alignment: .leading, spacing: Theme.Spacing.stack) {
-                            SectionHeader(title: "Tick list", trailing: "\(tickList.count) to send")
-                            ForEach(tickList) { climb in
+                            SectionHeader(title: "Current projects", trailing: "\(projects.count)")
+                            ForEach(projects) { climb in
                                 NavigationLink(value: climb) {
                                     ClimbRow(climb: climb)
                                         .matchedTransitionSource(id: climb.id, in: namespace)
@@ -97,10 +97,11 @@ struct HomeView: View {
 
     // MARK: Data
 
-    private var tickList: [Climb] {
+    /// Unsent projects on the wall — starred, or 5+ tries without a send.
+    private var projects: [Climb] {
         activeClimbs.inGym(app.currentGym)
-            .filter { $0.isOnTickList && !$0.hasSent }
-            .sorted { $0.gradeValue > $1.gradeValue }
+            .filter { $0.status == .project }
+            .sorted { ($0.gradeValue, $0.tryCount) > ($1.gradeValue, $1.tryCount) }
     }
 
     private var recentSessions: [ClimbSession] {

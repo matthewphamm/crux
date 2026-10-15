@@ -12,6 +12,7 @@ final class Climb {
     var createdAt: Date = Date.now
     /// Set when the wall is reset; the climb moves to the Stripped archive but keeps its history.
     var strippedAt: Date?
+    /// Legacy: the old tick list. Kept so existing stores load; migrated to `isProjectFlagged` on launch.
     var isOnTickList: Bool = false
     var isProjectFlagged: Bool = false
     var wall: Wall?

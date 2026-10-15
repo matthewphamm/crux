@@ -23,6 +23,7 @@ final class AppModel {
         self.sessions = SessionManager(context: container.mainContext, config: config, clock: clock)
         self.locator = GymLocator()
         ensureDefaultGym()
+        migrateTickListToProjects()
     }
 
     var context: ModelContext { container.mainContext }
@@ -116,6 +117,17 @@ final class AppModel {
             return
         }
         select(addGym(named: "Hive Vancouver"))
+    }
+
+    /// The tick list was folded into projects: unsent tick-listed climbs become starred projects.
+    private func migrateTickListToProjects() {
+        let ticked = (try? context.fetch(FetchDescriptor<Climb>(predicate: #Predicate { $0.isOnTickList }))) ?? []
+        guard !ticked.isEmpty else { return }
+        for climb in ticked {
+            if !climb.hasSent { climb.isProjectFlagged = true }
+            climb.isOnTickList = false
+        }
+        try? context.save()
     }
 
     private static let currentGymKey = "app.currentGymID"

@@ -149,14 +149,12 @@ struct ClimbFilterTests {
     @Test func segmentsAndFilters() {
         let env = TestEnvironment()
         let tick = env.climb(.three, tags: [.slab])
-        tick.isOnTickList = true
         let project = env.climb(.five, tags: [.overhang])
         project.isProjectFlagged = true
         let stripped = env.climb(.two)
         stripped.strippedAt = env.clock.now
         let climbs = [tick, project, stripped]
 
-        #expect(ClimbFilter.apply(climbs, segment: .tickList, filter: .init(), sort: .grade) == [tick])
         #expect(ClimbFilter.apply(climbs, segment: .projects, filter: .init(), sort: .grade) == [project])
         #expect(ClimbFilter.apply(climbs, segment: .stripped, filter: .init(), sort: .grade) == [stripped])
         #expect(ClimbFilter.apply(climbs, segment: .all, filter: .init(), sort: .grade) == [project, tick])

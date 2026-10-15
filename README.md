@@ -1,13 +1,13 @@
 # CRUX.
 
-**A calm, personal bouldering log for iPhone.** Log attempts and sends with one tap, and sessions start and end on their own. You can keep a tick list, track wall resets, and see where your climbing is going. Everything stays on your device.
+**A calm, personal bouldering log for iPhone.** Log attempts and sends with one tap, and sessions start and end on their own. You can star projects, track wall resets, and see where your climbing is going. Everything stays on your device.
 
 It's built around the **Hex grading system** used at [Hive Climbing](https://hiveclimbing.com/climb-overview) in Metro Vancouver.
 
 <p align="center">
   <img src="docs/screenshots/log.png" width="200" alt="Quick log with a live session">
   <img src="docs/screenshots/stats.png" width="200" alt="Progress dashboard">
-  <img src="docs/screenshots/climbs.png" width="200" alt="Tick list and filters">
+  <img src="docs/screenshots/climbs.png" width="200" alt="Climbs and filters">
   <img src="docs/screenshots/walls.png" width="200" alt="Walls and resets">
 </p>
 
@@ -22,8 +22,8 @@ It's built around the **Hex grading system** used at [Hive Climbing](https://hiv
 - **Multiple gyms** (e.g. Hive Vancouver, Surrey, Port Coquitlam), with a quick switcher and optional location-based auto-switching that never leaves the device.
 
 **Organizing**
-- **Tick list, Projects, All and Stripped** views, with grade-range, wall, hold color, status and style filters.
-- Climbs become **projects** automatically after 5 tries without a send, or when you flag them.
+- **Projects, All and Stripped** views, with grade-range, wall, hold color, status and style filters.
+- **Projects**: star a climb, or it becomes one automatically after 5 tries without a send. Home shows your current projects.
 - **Wall resets**: mark a wall as reset and its climbs move to the Stripped archive with their full history.
 
 **Progress**

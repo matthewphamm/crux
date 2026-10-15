@@ -94,3 +94,28 @@ struct GymTests {
         #expect(await app.autoDetectGym() == nil)
     }
 }
+
+@Suite("Projects")
+@MainActor
+struct ProjectMigrationTests {
+    @Test func unsentTickListClimbsBecomeStarredProjects() throws {
+        let container = CRUXApp.makeContainer(inMemory: true)
+        let context = container.mainContext
+        let unsent = Climb(grade: .four, holdColor: .red)
+        unsent.isOnTickList = true
+        let sent = Climb(grade: .two, holdColor: .blue)
+        sent.isOnTickList = true
+        context.insert(unsent)
+        context.insert(sent)
+        let send = Attempt(timestamp: .now, outcome: .send, sendType: .flash)
+        context.insert(send)
+        send.climb = sent
+        try context.save()
+
+        let defaults = UserDefaults(suiteName: "crux.tests.\(UUID().uuidString)")!
+        _ = AppModel(container: container, defaults: defaults)
+
+        #expect(unsent.isProjectFlagged && !unsent.isOnTickList)
+        #expect(!sent.isProjectFlagged && !sent.isOnTickList)
+    }
+}

@@ -1,12 +1,12 @@
 import SwiftData
 import SwiftUI
 
-/// Tick list, projects, everything on the wall, and the stripped archive — with filters.
+/// Projects, everything on the wall, and the stripped archive — with filters.
 struct ClimbsView: View {
     @Environment(AppModel.self) private var app
     @Query(sort: \Climb.createdAt, order: .reverse) private var allClimbs: [Climb]
 
-    @AppStorage("climbs.segment") private var segment: ClimbSegment = .tickList
+    @AppStorage("climbs.segment") private var segment: ClimbSegment = .projects
     @AppStorage("climbs.sort") private var sort: ClimbSort = .grade
     @State private var filter = ClimbFilter()
     @State private var query = ""
@@ -213,7 +213,6 @@ struct ClimbsView: View {
     private var emptyTitle: String {
         if filter.isActive || !query.isEmpty { return "No matches" }
         switch segment {
-        case .tickList: return "Tick list is empty"
         case .projects: return "No projects"
         case .all: return "No climbs yet"
         case .stripped: return "Nothing stripped"
@@ -223,7 +222,6 @@ struct ClimbsView: View {
     private var emptyMessage: String {
         if filter.isActive || !query.isEmpty { return "Try loosening your filters." }
         switch segment {
-        case .tickList: return "Add climbs you want to send to your tick list."
         case .projects: return "Climbs become projects after \(Climb.projectThreshold) tries without a send, or when you flag them."
         case .all: return "Add a climb to start logging."
         case .stripped: return "When you mark a wall reset, its climbs are archived here with their history."
@@ -238,18 +236,10 @@ struct ClimbRow: View {
         HStack(spacing: 14) {
             HexBadge(grade: climb.grade, color: climb.holdColor, size: 44, glowing: climb.status.isTopped)
             VStack(alignment: .leading, spacing: 3) {
-                HStack(spacing: 6) {
-                    Text(climb.displayName)
-                        .font(.headline)
-                        .foregroundStyle(Theme.ink)
-                        .lineLimit(1)
-                    if climb.isOnTickList {
-                        Image(systemName: climb.hasSent ? "checkmark.seal.fill" : "bookmark.fill")
-                            .font(.caption)
-                            .foregroundStyle(climb.hasSent ? Theme.send : Theme.accent)
-                            .accessibilityLabel(climb.hasSent ? "Ticked" : "On tick list")
-                    }
-                }
+                Text(climb.displayName)
+                    .font(.headline)
+                    .foregroundStyle(Theme.ink)
+                    .lineLimit(1)
                 Text(subtitle)
                     .font(.subheadline)
                     .foregroundStyle(Theme.inkSecondary)
