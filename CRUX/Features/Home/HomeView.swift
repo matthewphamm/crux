@@ -86,7 +86,7 @@ struct HomeView: View {
                 Text("Ready when you are")
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(Theme.ink)
-                Text("Tap **Start session** below when you get to the wall. Add the problems you try, log every attempt and send, then end it when you're done.")
+                Text("Tap **＋** in the middle of the tab bar when you get to the wall. Add the problems you try, log every attempt and send, then end it when you're done.")
                     .font(.subheadline)
                     .foregroundStyle(Theme.inkSecondary)
                     .fixedSize(horizontal: false, vertical: true)

@@ -14,7 +14,7 @@ It's built around the **Hex grading system** used at [Hive Climbing](https://hiv
 ## Features
 
 **Logging at the wall**
-- **Start session** from the bar above the tab bar. It opens a full-screen live session, and while you're climbing the bar shows the running clock.
+- **Start session** with the ＋ in the middle of the tab bar. It opens a full-screen live session; while you climb, the button turns into **Session** so you can jump back in.
 - Inside a session, add problems **from the wall** or create a **new climb**. Each one gets big **+ Attempt** and **Send** buttons.
 - **Send-type inference**: a send on the first try is a *flash*, a send after failed tries is a *send*, and a send after an earlier send is a *repeat*. Long-press the send button to choose a different one.
 - A four-second **undo** toast for every log.

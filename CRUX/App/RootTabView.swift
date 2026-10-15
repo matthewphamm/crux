@@ -3,6 +3,8 @@ import SwiftUI
 
 enum AppTab: Hashable {
     case home, climbs, walls, stats
+    /// The middle + button. Never actually selected — it opens the live session.
+    case session
 }
 
 struct RootTabView: View {
@@ -14,13 +16,22 @@ struct RootTabView: View {
 
     var body: some View {
         @Bindable var logger = logger
-        TabView(selection: $tab) {
+        TabView(selection: tabSelection) {
             Tab("Home", systemImage: "hexagon.fill", value: .home) {
                 HomeView()
             }
             Tab("Climbs", systemImage: "list.bullet.rectangle", value: .climbs) {
                 ClimbsView()
             }
+            Tab(value: .session) {
+                Color.clear
+            } label: {
+                Label(
+                    sessions.activeSession == nil ? "Start" : "Session",
+                    systemImage: sessions.activeSession == nil ? "plus.circle.fill" : "record.circle"
+                )
+            }
+            .accessibilityLabel(sessions.activeSession == nil ? "Start session" : "Open session")
             Tab("Walls", systemImage: "square.stack.3d.up", value: .walls) {
                 WallsView()
             }
@@ -28,7 +39,6 @@ struct RootTabView: View {
                 StatsView()
             }
         }
-        .tabViewBottomAccessory { SessionAccessory() }
         .fullScreenCover(isPresented: $logger.isSessionPresented) {
             LiveSessionView()
         }
@@ -45,6 +55,19 @@ struct RootTabView: View {
             applyLaunchArguments()
             #endif
             await watchSessionTimeout()
+        }
+    }
+
+    /// The middle tab opens the session over whatever tab you're on instead of switching to it.
+    private var tabSelection: Binding<AppTab> {
+        Binding {
+            tab
+        } set: { newValue in
+            if newValue == .session {
+                logger.openSession()
+            } else {
+                tab = newValue
+            }
         }
     }
 
