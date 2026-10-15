@@ -10,27 +10,31 @@ enum ClimbSegment: String, CaseIterable, Identifiable {
 
 enum ClimbSort: String, CaseIterable, Identifiable {
     case grade = "Grade"
-    case recent = "Most recent"
-    case attempts = "Attempts"
+    case recent = "Recent"
+    case attempts = "Tries"
 
     var id: String { rawValue }
 }
 
 /// Everything the Climbs tab can narrow by. Pure value type so it's trivially testable.
+/// Every set is "match any"; an empty set means no filter on that field.
 struct ClimbFilter: Equatable {
-    var minGrade: HexGrade = .one
-    var maxGrade: HexGrade = .seven
-    var wallID: UUID?
+    var grades: Set<HexGrade> = []
+    var wallIDs: Set<UUID> = []
     var colors: Set<HoldColor> = []
     var statuses: Set<ClimbStatus> = []
     var tags: Set<StyleTag> = []
 
     var isActive: Bool { self != ClimbFilter() }
-    var hasGradeRange: Bool { minGrade != .one || maxGrade != .seven }
+
+    /// How many of the options in the Filter sheet are in use (grade has its own strip).
+    var sheetFilterCount: Int {
+        wallIDs.count + colors.count + statuses.count + tags.count
+    }
 
     func matches(_ climb: Climb) -> Bool {
-        (minGrade...maxGrade).contains(climb.grade)
-            && (wallID == nil || climb.wall?.id == wallID)
+        (grades.isEmpty || grades.contains(climb.grade))
+            && (wallIDs.isEmpty || climb.wall.map { wallIDs.contains($0.id) } == true)
             && (colors.isEmpty || colors.contains(climb.holdColor))
             && (statuses.isEmpty || statuses.contains(climb.status))
             && (tags.isEmpty || !tags.isDisjoint(with: climb.styleTags))

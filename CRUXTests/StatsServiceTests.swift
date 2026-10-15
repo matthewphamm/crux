@@ -160,7 +160,7 @@ struct ClimbFilterTests {
         #expect(ClimbFilter.apply(climbs, segment: .all, filter: .init(), sort: .grade) == [project, tick])
 
         var filter = ClimbFilter()
-        filter.minGrade = .four
+        filter.grades = [.four, .five]
         #expect(ClimbFilter.apply(climbs, segment: .all, filter: filter, sort: .grade) == [project])
 
         filter = ClimbFilter()

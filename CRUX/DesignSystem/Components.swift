@@ -72,31 +72,6 @@ struct StatTile: View {
     }
 }
 
-// MARK: - Filter chip
-
-struct FilterChip: View {
-    let title: String
-    var value: String?
-    var isActive: Bool
-    var symbol: String?
-
-    var body: some View {
-        HStack(spacing: 6) {
-            if let symbol { Image(systemName: symbol).font(.caption.weight(.semibold)) }
-            Text(value ?? title)
-                .font(.subheadline.weight(isActive ? .semibold : .regular))
-            Image(systemName: "chevron.down")
-                .font(.caption2.weight(.bold))
-                .opacity(0.6)
-        }
-        .foregroundStyle(isActive ? Theme.accent : Theme.ink)
-        .padding(.horizontal, 14)
-        .padding(.vertical, 9)
-        .glassEffect(isActive ? .regular.tint(Theme.accent.opacity(0.2)).interactive() : .regular.interactive(), in: .capsule)
-        .animation(Theme.spring, value: isActive)
-    }
-}
-
 // MARK: - Tag pill
 
 struct TagPill: View {

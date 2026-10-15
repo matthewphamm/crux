@@ -22,7 +22,7 @@ It's built around the **Hex grading system** used at [Hive Climbing](https://hiv
 - **Multiple gyms** (e.g. Hive Vancouver, Surrey, Port Coquitlam), with a quick switcher and optional location-based auto-switching that never leaves the device.
 
 **Organizing**
-- **Projects, All and Stripped** views, with grade-range, wall, hold color, status and style filters.
+- **Projects, All and Stripped** views. Tap hex grades to narrow the list; wall, status, hold color, style and sort live in one Filter sheet.
 - **Projects**: star a climb, or it becomes one automatically after 5 tries without a send. Home shows your current projects.
 - **Wall resets**: mark a wall as reset and its climbs move to the Stripped archive with their full history.
 
