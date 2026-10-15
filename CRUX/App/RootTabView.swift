@@ -11,6 +11,7 @@ struct RootTabView: View {
     @Environment(AppModel.self) private var app
     @Environment(SessionManager.self) private var sessions
     @Environment(LogCoordinator.self) private var logger
+    @Environment(GymMenuState.self) private var gymMenu
     @Environment(\.scenePhase) private var scenePhase
     @State private var tab: AppTab = .home
 
@@ -39,6 +40,8 @@ struct RootTabView: View {
                 StatsView()
             }
         }
+        .overlay { GymMenuOverlay() }
+        .onChange(of: tab) { gymMenu.isOpen = false }
         .fullScreenCover(isPresented: $logger.isSessionPresented) {
             LiveSessionView()
         }

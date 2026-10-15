@@ -5,6 +5,7 @@ import SwiftUI
 struct CRUXApp: App {
     @State private var app: AppModel
     @State private var logger: LogCoordinator
+    @State private var gymMenu = GymMenuState()
     @AppStorage(Appearance.storageKey) private var appearance: Appearance = .dark
 
     init() {
@@ -22,6 +23,7 @@ struct CRUXApp: App {
                 .environment(app.sessions)
                 .environment(app.config)
                 .environment(logger)
+                .environment(gymMenu)
                 .modelContainer(app.container)
                 .preferredColorScheme(appearance.colorScheme)
                 .tint(Theme.accent)

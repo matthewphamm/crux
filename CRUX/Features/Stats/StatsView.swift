@@ -47,7 +47,7 @@ struct StatsView: View {
             .nightGymBackground()
             .navigationTitle("Progress")
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) { GymSwitcher(allGyms: $allGyms) }
+                ToolbarItem(placement: .topBarLeading) { GymSwitcher(offersAllGyms: true) }
                 ToolbarItem(placement: .topBarTrailing) { SettingsToolbarButton() }
             }
             .navigationDestination(for: ClimbSession.self) { SessionDetailView(session: $0) }
