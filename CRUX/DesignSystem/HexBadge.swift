@@ -35,7 +35,7 @@ nonisolated private extension CGPoint {
     }
 }
 
-/// Grade number inside a hold-colored hexagon with a soft glow.
+/// A hold-colored hexagon tag showing the grade as 1–7 small hexes (like Hive's wall tags), with a soft glow.
 ///
 /// `bloom` changing plays a one-time glow bloom — used when a project is sent.
 struct HexBadge: View {
@@ -59,9 +59,10 @@ struct HexBadge: View {
                 )
             Hexagon()
                 .strokeBorderCompat(Color.white.opacity(color == .black ? 0.22 : 0.18), lineWidth: 1)
-            Text("\(grade.rawValue)")
-                .font(.system(size: size * 0.44, weight: .bold, design: .rounded))
-                .foregroundStyle(color.prefersDarkText ? Color.black.opacity(0.8) : .white)
+            HexPips(
+                count: grade.rawValue,
+                color: color.prefersDarkText ? Color.black.opacity(0.78) : Color.white.opacity(0.95)
+            )
         }
         .frame(width: size, height: size)
         .shadow(color: color.glow.opacity(glowing ? 0.55 : 0.28), radius: glowing ? size * 0.32 : size * 0.16)

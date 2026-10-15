@@ -36,6 +36,7 @@
 		9C64449E24593633B220A594 /* CRUXApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED35727C2195A9DAD1B3A4E /* CRUXApp.swift */; };
 		A3F365DF1A7E09E919648CD4 /* Climb+Status.swift in Sources */ = {isa = PBXBuildFile; fileRef = D646F68BB488C3DA3C1029F0 /* Climb+Status.swift */; };
 		A71C59BCF3D873C7E0334B2D /* ClimbFilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 072F543132C084704FAEF417 /* ClimbFilterSheet.swift */; };
+		A7CD85E0F9BF9C3ED9343C3D /* HexPips.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEC86E1BCFE323AC84918313 /* HexPips.swift */; };
 		AAA3461BB7E3E953AEEF5CCD /* GymSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FA06B2F23E62038622BC4D1 /* GymSwitcher.swift */; };
 		AB5B6555EA454C15C2884DE4 /* WallsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D974D350DA030EDE5A63CC92 /* WallsView.swift */; };
 		ADE59B1738A349B7C1FE5ABE /* HexBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E5C9B69834634BE4353F42 /* HexBadge.swift */; };
@@ -134,6 +135,7 @@
 		F569AB9FB4C92BC68E9F5091 /* ClimbDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbDetailView.swift; sourceTree = "<group>"; };
 		FBAAA1EAEF5CB6CEC86E079A /* Climb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Climb.swift; sourceTree = "<group>"; };
 		FE9EEF1A8F629E7CDF6DB76B /* TestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSupport.swift; sourceTree = "<group>"; };
+		FEC86E1BCFE323AC84918313 /* HexPips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HexPips.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -277,6 +279,7 @@
 			children = (
 				577DC4E1DB4E952AF42F0D2A /* Components.swift */,
 				B6E5C9B69834634BE4353F42 /* HexBadge.swift */,
+				FEC86E1BCFE323AC84918313 /* HexPips.swift */,
 				1ACD6AC3F9D42A84D7C57669 /* Theme.swift */,
 			);
 			path = DesignSystem;
@@ -491,6 +494,7 @@
 				43885802A4B9932A3B7CA456 /* HapticsService.swift in Sources */,
 				ADE59B1738A349B7C1FE5ABE /* HexBadge.swift in Sources */,
 				40401FC006282322DECA9F22 /* HexGrade.swift in Sources */,
+				A7CD85E0F9BF9C3ED9343C3D /* HexPips.swift in Sources */,
 				D3F55F96AA80D2F9BD903B2F /* HoldColor.swift in Sources */,
 				E0C0BA959D8A8A048DADAC51 /* HomeView.swift in Sources */,
 				F48F82AA54DA1C2E9C50B4DD /* LiveSessionView.swift in Sources */,
