@@ -94,6 +94,12 @@ struct Insight: Identifiable, Equatable {
     }
 }
 
+struct WeekSummary: Equatable {
+    let sessions: Int
+    let sends: Int
+    let hardestSend: Int?
+}
+
 struct SessionStats: Equatable {
     let duration: TimeInterval
     let attempts: Int
@@ -262,6 +268,20 @@ enum StatsService {
             hardestSend: sendGrades.max(),
             attemptsPerSend: sends.isEmpty ? nil : Double(attempts.count) / Double(sends.count),
             pyramid: pyramid
+        )
+    }
+
+    /// Finished sessions in the calendar week containing `now`.
+    static func weekSummary(_ sessions: [ClimbSession], now: Date, calendar: Calendar = .current) -> WeekSummary {
+        guard let week = calendar.dateInterval(of: .weekOfYear, for: now) else {
+            return WeekSummary(sessions: 0, sends: 0, hardestSend: nil)
+        }
+        let thisWeek = sessions.filter { !$0.isOpen && week.contains($0.startedAt) && !($0.attempts ?? []).isEmpty }
+        let sends = thisWeek.flatMap { ($0.attempts ?? []).filter(\.isSend) }
+        return WeekSummary(
+            sessions: thisWeek.count,
+            sends: sends.count,
+            hardestSend: sends.compactMap { $0.climb?.gradeValue }.max()
         )
     }
 

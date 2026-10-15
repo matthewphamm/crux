@@ -105,6 +105,27 @@ struct StatsServiceTests {
         #expect(StatsService.comparison(for: current, among: env.allSessions()) == "+3 sends vs your last 2 sessions")
     }
 
+    @Test func weekSummaryCountsOnlyThisWeek() throws {
+        let env = TestEnvironment(timeoutMinutes: 30)
+        // Last week: a session that shouldn't count.
+        env.clock.now = Calendar.current.date(byAdding: .day, value: -8, to: env.clock.now)!
+        env.work(env.climb(.six), failures: 0, thenSend: true)
+        env.sessions.endActiveSession()
+        // This week: two sessions.
+        env.clock.now = Date(timeIntervalSince1970: 1_790_000_000)
+        let week = Calendar.current.dateInterval(of: .weekOfYear, for: env.clock.now)!
+        env.clock.now = week.start.addingTimeInterval(3600)
+        env.work(env.climb(.three), failures: 1, thenSend: true)
+        env.sessions.endActiveSession()
+        env.clock.advance(minutes: 120)
+        env.work(env.climb(.four), failures: 0, thenSend: true)
+        env.work(env.climb(.two), failures: 2, thenSend: false)
+        env.sessions.endActiveSession()
+
+        let summary = StatsService.weekSummary(env.allSessions(), now: env.clock.now)
+        #expect(summary == WeekSummary(sessions: 2, sends: 2, hardestSend: 4))
+    }
+
     @Test func insightFlagsAWeakStyle() {
         let env = TestEnvironment()
         // Slab: 1 of 6 sent.

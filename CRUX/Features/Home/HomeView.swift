@@ -26,7 +26,7 @@ struct HomeView: View {
                             confirmingEnd = true
                         }
                     } else {
-                        startCard
+                        weekCard
                     }
 
                     if !projects.isEmpty {
@@ -79,20 +79,34 @@ struct HomeView: View {
         }
     }
 
-    private var startCard: some View {
-        HStack(alignment: .top, spacing: 14) {
-            HexBadge(grade: .three, color: .orange, size: 44, glowing: true)
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Ready when you are")
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(Theme.ink)
-                Text("Tap **＋** in the middle of the tab bar when you get to the wall. Add the problems you try, log every attempt and send, then end it when you're done.")
-                    .font(.subheadline)
-                    .foregroundStyle(Theme.inkSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
+    /// When you're not climbing: how this week is going, at a glance.
+    private var weekCard: some View {
+        let week = StatsService.weekSummary(gymSessions, now: .now)
+        return VStack(alignment: .leading, spacing: 12) {
+            SectionHeader(title: "This week")
+            HStack(spacing: 10) {
+                StatTile(value: "\(week.sessions)", caption: week.sessions == 1 ? "session" : "sessions", symbol: "calendar")
+                StatTile(value: "\(week.sends)", caption: week.sends == 1 ? "send" : "sends", tint: Theme.send, symbol: "checkmark")
+                hardestTile(week.hardestSend)
             }
+            Text(lastSessionLine)
+                .font(.footnote)
+                .foregroundStyle(Theme.inkTertiary)
+                .padding(.horizontal, 4)
         }
-        .glassCard(padding: 18)
+    }
+
+    private func hardestTile(_ grade: Int?) -> some View {
+        StatTile(value: grade.map { "\($0) Hex" } ?? "—", caption: "hardest", tint: Theme.accent, symbol: "hexagon.fill")
+    }
+
+    private var lastSessionLine: String {
+        guard let last = gymSessions.first else { return "No sessions yet — tap ＋ to start one." }
+        let sends = (last.attempts ?? []).filter(\.isSend).count
+        let day = Calendar.current.isDateInToday(last.startedAt) ? "today"
+            : Calendar.current.isDateInYesterday(last.startedAt) ? "yesterday"
+            : last.startedAt.formatted(.dateTime.weekday(.wide))
+        return "Last session \(day) · \(Format.count(sends, "send"))"
     }
 
     // MARK: Data
@@ -104,13 +118,12 @@ struct HomeView: View {
             .sorted { ($0.gradeValue, $0.tryCount) > ($1.gradeValue, $1.tryCount) }
     }
 
-    private var recentSessions: [ClimbSession] {
-        Array(
-            allSessions
-                .filter { !$0.isOpen && $0.gym?.id == app.currentGym?.id && !($0.attempts ?? []).isEmpty }
-                .prefix(3)
-        )
+    /// Finished, non-empty sessions at this gym, newest first.
+    private var gymSessions: [ClimbSession] {
+        allSessions.filter { !$0.isOpen && $0.gym?.id == app.currentGym?.id && !($0.attempts ?? []).isEmpty }
     }
+
+    private var recentSessions: [ClimbSession] { Array(gymSessions.prefix(3)) }
 }
 
 /// The running session, with Resume and End.
