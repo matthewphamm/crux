@@ -46,11 +46,12 @@ struct GymDetailView: View {
                 Task { await useCurrentLocation() }
             }
         }
-        .confirmationDialog("Delete \(gym.name)?", isPresented: $confirmingDelete, titleVisibility: .visible) {
+        .alert("Delete \(gym.name)?", isPresented: $confirmingDelete) {
             Button("Delete gym and its history", role: .destructive) {
                 app.delete(gym)
                 dismiss()
             }
+            Button("Cancel", role: .cancel) {}
         } message: {
             Text("Its walls, climbs, sessions and beta are removed from this iPhone.")
         }

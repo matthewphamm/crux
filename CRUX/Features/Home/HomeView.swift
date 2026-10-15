@@ -70,11 +70,13 @@ struct HomeView: View {
             }
             .navigationDestination(for: ClimbSession.self) { SessionDetailView(session: $0) }
             .sheet(item: $summary) { SessionDetailView(session: $0, isSummary: true) }
-            .confirmationDialog("End this session?", isPresented: $confirmingEnd, titleVisibility: .visible) {
+            .alert("End this session?", isPresented: $confirmingEnd) {
                 Button("End session") {
                     withAnimation(Theme.spring) { summary = sessions.endActiveSession() }
                 }
                 Button("Keep climbing", role: .cancel) {}
+            } message: {
+                Text(endMessage)
             }
         }
     }
@@ -107,6 +109,13 @@ struct HomeView: View {
             : Calendar.current.isDateInYesterday(last.startedAt) ? "yesterday"
             : last.startedAt.formatted(.dateTime.weekday(.wide))
         return "Last session \(day) · \(Format.count(sends, "send"))"
+    }
+
+    private var endMessage: String {
+        let logs = sessions.activeSession?.attempts?.count ?? 0
+        return logs == 0
+            ? "Nothing's been logged yet, so this session won't be saved."
+            : "You'll see a summary of your \(logs == 1 ? "1 log" : "\(logs) logs")."
     }
 
     // MARK: Data

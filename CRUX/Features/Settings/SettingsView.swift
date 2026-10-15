@@ -334,22 +334,23 @@ private struct DeveloperSection: View {
             .buttonStyle(.plain)
         }
         .settingsSection("Developer", footer: "Debug builds only. The timeout override makes sessions auto-end in seconds for testing.")
-        .confirmationDialog("Replace this gym's data with sample history?", isPresented: $confirmingSeed, titleVisibility: .visible) {
+        .alert("Replace this gym's data with sample history?", isPresented: $confirmingSeed) {
             Button("Load sample data", role: .destructive) {
                 guard let gym = app.currentGym else { return }
                 _ = sessions.endActiveSession()
                 SeedData.loadSample(into: gym, context: context)
                 sessions.refresh()
             }
+            Button("Cancel", role: .cancel) {}
         }
-        .confirmationDialog("Delete all climbs, sessions and walls for this gym?", isPresented: $confirmingWipe,
-                            titleVisibility: .visible) {
+        .alert("Delete all climbs, sessions and walls for this gym?", isPresented: $confirmingWipe) {
             Button("Delete everything", role: .destructive) {
                 guard let gym = app.currentGym else { return }
                 SeedData.wipe(gym, context: context)
                 for name in AppModel.defaultWallNames { app.addWall(named: name, to: gym) }
                 sessions.refresh()
             }
+            Button("Cancel", role: .cancel) {}
         }
     }
 

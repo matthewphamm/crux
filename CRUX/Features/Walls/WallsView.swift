@@ -42,16 +42,16 @@ struct WallsView: View {
                 }
             }
             .navigationDestination(for: Wall.self) { WallDetailView(wall: $0) }
-            .confirmationDialog(
+            .alert(
                 "Mark \(resetting?.name ?? "wall") as reset?",
                 isPresented: Binding(get: { resetting != nil }, set: { if !$0 { resetting = nil } }),
-                titleVisibility: .visible,
                 presenting: resetting
             ) { wall in
                 Button("Strip \(wall.activeClimbs.count) climbs", role: .destructive) {
                     withAnimation(Theme.spring) { ResetService.reset(wall, in: context) }
                     resetTick += 1
                 }
+                Button("Cancel", role: .cancel) {}
             } message: { _ in
                 Text("Climbs on this wall move to Stripped. Their logs and beta stay in your history.")
             }

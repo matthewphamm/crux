@@ -98,20 +98,22 @@ struct WallDetailView: View {
             }
             Button("Cancel", role: .cancel) {}
         }
-        .confirmationDialog("Mark \(wall.name) as reset?", isPresented: $confirmingReset, titleVisibility: .visible) {
+        .alert("Mark \(wall.name) as reset?", isPresented: $confirmingReset) {
             Button("Strip \(wall.activeClimbs.count) climbs", role: .destructive) {
                 withAnimation(Theme.spring) { ResetService.reset(wall, in: context) }
                 resetTick += 1
             }
+            Button("Cancel", role: .cancel) {}
         } message: {
             Text("Climbs on this wall move to Stripped. Their logs and beta stay in your history.")
         }
-        .confirmationDialog("Delete \(wall.name)?", isPresented: $confirmingDelete, titleVisibility: .visible) {
+        .alert("Delete \(wall.name)?", isPresented: $confirmingDelete) {
             Button("Delete wall", role: .destructive) {
                 context.delete(wall)
                 try? context.save()
                 dismiss()
             }
+            Button("Cancel", role: .cancel) {}
         } message: {
             Text("Climbs stay in your history without a wall.")
         }

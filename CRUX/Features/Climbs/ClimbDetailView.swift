@@ -45,8 +45,9 @@ struct ClimbDetailView: View {
         }
         .logToast()
         .sheet(isPresented: $editing) { ClimbEditorSheet(mode: .edit(climb)) }
-        .confirmationDialog("Delete this climb?", isPresented: $confirmingDelete, titleVisibility: .visible) {
+        .alert("Delete this climb?", isPresented: $confirmingDelete) {
             Button("Delete climb and its history", role: .destructive) { delete() }
+            Button("Cancel", role: .cancel) {}
         } message: {
             Text("All \(climb.tryCount) logs and any beta media will be removed. To keep history, strip it instead.")
         }

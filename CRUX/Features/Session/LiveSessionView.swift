@@ -76,7 +76,7 @@ struct LiveSessionView: View {
             .sheet(isPresented: $showingNewClimb) {
                 ClimbEditorSheet(mode: .create)
             }
-            .confirmationDialog("End this session?", isPresented: $confirmingEnd, titleVisibility: .visible) {
+            .alert("End this session?", isPresented: $confirmingEnd) {
                 Button("End session") { end() }
                 Button("Keep climbing", role: .cancel) {}
             } message: {
