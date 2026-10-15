@@ -46,7 +46,7 @@ struct HomeView: View {
                         VStack(alignment: .leading, spacing: Theme.Spacing.stack) {
                             SectionHeader(title: "Recent sessions")
                             ForEach(recentSessions) { session in
-                                NavigationLink(value: session) { SessionRow(session: session, showsHardest: false) }
+                                NavigationLink(value: session) { SessionRow(session: session) }
                                     .buttonStyle(.plain)
                             }
                         }

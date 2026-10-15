@@ -54,8 +54,6 @@ struct SessionsListView: View {
 
 struct SessionRow: View {
     let session: ClimbSession
-    /// Hardest-send badge on the right. Hidden on Home to keep it calm.
-    var showsHardest = true
 
     var body: some View {
         let stats = StatsService.sessionStats(session)
@@ -69,10 +67,6 @@ struct SessionRow: View {
                     .foregroundStyle(Theme.inkSecondary)
             }
             Spacer()
-            if showsHardest, let hardest = stats.hardestSend {
-                HexBadge(grade: HexGrade(clamping: hardest), color: .black, size: 34, glowing: true)
-                    .accessibilityLabel("Hardest send \(HexGrade(clamping: hardest).label)")
-            }
         }
         .glassCard(padding: 14)
         .accessibilityElement(children: .combine)
