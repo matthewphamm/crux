@@ -190,3 +190,23 @@ struct ClimbFilterTests {
         #expect(filter.isActive)
     }
 }
+
+@Suite("Session calendar")
+struct CalendarMonthTests {
+    @Test func padsLeadingDaysToTheFirstWeekday() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "America/Vancouver")!
+        calendar.firstWeekday = 1 // Sunday
+        // October 2026 starts on a Thursday.
+        let october = try #require(calendar.date(from: DateComponents(year: 2026, month: 10, day: 15)))
+        let days = CalendarMonth.days(in: october, calendar: calendar)
+
+        #expect(days.prefix(4).allSatisfy { $0 == nil })
+        #expect(days.compactMap(\.self).count == 31)
+        #expect(days[4].map { calendar.component(.day, from: $0) } == 1)
+
+        calendar.firstWeekday = 2 // Monday
+        #expect(CalendarMonth.days(in: october, calendar: calendar).prefix(while: { $0 == nil }).count == 3)
+        #expect(CalendarMonth.weekdaySymbols(calendar: calendar).first == "M")
+    }
+}

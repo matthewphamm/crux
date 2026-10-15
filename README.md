@@ -34,6 +34,7 @@ It's built around the **Hex grading system** used at [Hive Climbing](https://hiv
   - **average tries to send**
 - A **grade pyramid**, **sends per grade over time**, and **tries-to-send by grade** (Swift Charts).
 - A **style breakdown** with rule-based insights, such as *"You rarely send slab at 4 Hex+ — 1 of 6 sent, vs 52% overall."*
+- **Session calendar**: climbing days glow on a month calendar; tap a day to open its session.
 - **Session stats**:
   - volume
   - hardest send
