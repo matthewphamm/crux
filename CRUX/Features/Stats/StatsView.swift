@@ -11,19 +11,21 @@ struct StatsView: View {
     @AppStorage("stats.allGyms") private var allGyms = false
     @Query(sort: \Gym.createdAt) private var gyms: [Gym]
 
-    @State private var pyramidSelection: String?
     @State private var timeSelection: Date?
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: Theme.Spacing.section) {
-                    Picker("Range", selection: $range.animation(Theme.spring)) {
-                        ForEach(StatsRange.allCases) { Text($0.label).tag($0) }
-                    }
-                    .pickerStyle(.segmented)
+                    CruxSegmented(options: StatsRange.allCases, selection: $range) { $0.label }
 
-                    headline
+                    currentGradeCard
+                    HStack(spacing: Theme.Spacing.cardGap) {
+                        StatTile(value: Format.percent(StatsService.flashRate(tops)), caption: "flash rate",
+                                 tint: Theme.accent, symbol: "bolt.fill")
+                        StatTile(value: Format.decimal(StatsService.averageTriesToSend(tops)), caption: "avg tries to send",
+                                 tint: Theme.inkSecondary, symbol: "arrow.2.squarepath")
+                    }
 
                     if tops.isEmpty {
                         ContentUnavailableView(
@@ -69,82 +71,90 @@ struct StatsView: View {
     private var insights: [Insight] { StatsService.insights(climbs, since: start) }
     private var styles: [StyleStat] { StatsService.styleBreakdown(climbs, since: start) }
 
-    // MARK: Headline
+    // MARK: Current grade
 
-    private var headline: some View {
+    private var currentGradeCard: some View {
         let current = StatsService.currentGrade(from: climbs, now: now)
-        let max = StatsService.maxGrade(StatsService.tops(from: climbs))
-        return Grid(horizontalSpacing: 10, verticalSpacing: 10) {
-            GridRow {
-                gradeTile(current, caption: "current grade", footnote: "3+ sends, 60 days")
-                gradeTile(max, caption: "max send", footnote: "all time")
+        let maxSend = StatsService.maxGrade(StatsService.tops(from: climbs))
+        return VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    SectionHeader(title: "Current grade")
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text(current.map { "\($0) Hex" } ?? "—")
+                            .font(.number(size: 34, weight: .bold))
+                            .foregroundStyle(Theme.ink)
+                            .contentTransition(.numericText())
+                        if let current {
+                            Text(HexGrade(clamping: current).vRange)
+                                .font(.system(size: 17, weight: .medium))
+                                .foregroundStyle(Theme.inkSecondary)
+                        }
+                    }
+                }
+                Spacer()
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("max send")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.inkSecondary)
+                    Text(maxSend.map { "\($0) Hex" } ?? "—")
+                        .font(.number(size: 17, weight: .bold))
+                        .foregroundStyle(Theme.ink)
+                }
             }
-            GridRow {
-                StatTile(value: Format.percent(StatsService.flashRate(tops)), caption: "flash rate",
-                         tint: Theme.Chart.flash, symbol: "bolt.fill")
-                StatTile(value: Format.decimal(StatsService.averageTriesToSend(tops)), caption: "avg tries to send",
-                         symbol: "repeat")
-            }
+
+            GradeLadder(current: current)
+
+            Text(ladderCaption(current))
+                .font(.system(size: 13))
+                .foregroundStyle(Theme.inkSecondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous).fill(Theme.cardFill))
+        .overlay(RoundedRectangle(cornerRadius: Theme.Radius.card, style: .continuous).strokeBorder(Theme.cardBorder, lineWidth: 1))
+        .animation(Theme.spring, value: current)
     }
 
-    private func gradeTile(_ grade: Int?, caption: String, footnote: String) -> some View {
-        HStack(spacing: 12) {
-            if let grade {
-                HexBadge(grade: HexGrade(clamping: grade), color: .black, size: 40, glowing: true)
-            }
-            VStack(alignment: .leading, spacing: 2) {
-                Text(grade.map { HexGrade(clamping: $0).vRange } ?? "—")
-                    .font(.number(.headline))
-                    .foregroundStyle(Theme.ink)
-                Text(caption).font(.caption).foregroundStyle(Theme.inkSecondary)
-                Text(footnote).font(.caption2).foregroundStyle(Theme.inkTertiary)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .glassCard(padding: 14)
-        .accessibilityElement(children: .combine)
+    /// "1 of 3 sends needed at 6 Hex in the last 60 days."
+    private func ladderCaption(_ current: Int?) -> String {
+        let needed = StatsService.currentGradeMinimumSends
+        let days = StatsService.currentGradeWindowDays
+        let target = min((current ?? 0) + 1, 7)
+        if let current, current >= 7 { return "Top of the scale. Keep sending 7 Hex to hold it." }
+        let windowStart = Calendar.current.date(byAdding: .day, value: -days, to: now)
+        let have = StatsService.tops(from: climbs, since: windowStart).filter { $0.grade == target }.count
+        return "\(min(have, needed)) of \(needed) sends needed at \(target) Hex in the last \(days) days."
     }
 
     // MARK: Pyramid
 
     private var pyramidCard: some View {
-        let rows = StatsService.pyramid(tops).filter { $0.total > 0 || $0.grade <= (StatsService.maxGrade(tops) ?? 1) }
+        let maxGrade = StatsService.maxGrade(tops) ?? 1
+        let rows = StatsService.pyramid(tops).filter { $0.grade <= maxGrade }.sorted { $0.grade > $1.grade }
+        let widest = max(rows.map(\.total).max() ?? 1, 1)
         return VStack(alignment: .leading, spacing: 14) {
             SectionHeader(title: "Grade pyramid", trailing: "\(tops.count) tops")
-            Chart {
+            VStack(spacing: 8) {
                 ForEach(rows) { row in
-                    BarMark(x: .value("Count", row.flashes), y: .value("Grade", HexGrade(clamping: row.grade).label))
-                        .foregroundStyle(by: .value("Type", "Flash"))
-                        .cornerRadius(4)
-                    BarMark(x: .value("Count", row.sends), y: .value("Grade", HexGrade(clamping: row.grade).label))
-                        .foregroundStyle(by: .value("Type", "Send"))
-                        .cornerRadius(4)
-                }
-                if let pyramidSelection, let row = rows.first(where: { HexGrade(clamping: $0.grade).label == pyramidSelection }) {
-                    RuleMark(y: .value("Grade", pyramidSelection))
-                        .foregroundStyle(Theme.hairline)
-                        .annotation(position: .trailing, alignment: .center, spacing: 6) {
-                            Text("\(row.flashes) flash · \(row.sends) send")
-                                .font(.caption2.weight(.medium))
-                                .foregroundStyle(Theme.ink)
-                                .padding(.horizontal, 8).padding(.vertical, 4)
-                                .glassEffect(.regular, in: .capsule)
-                        }
+                    PyramidRowView(row: row, widest: widest)
                 }
             }
-            .chartForegroundStyleScale(["Flash": Theme.Chart.flash, "Send": Theme.Chart.send])
-            .chartYScale(domain: rows.map { HexGrade(clamping: $0.grade).label }.reversed())
-            .chartYSelection(value: $pyramidSelection)
-            .chartXAxis { AxisMarks(values: .automatic(desiredCount: 4)) { _ in
-                AxisGridLine().foregroundStyle(Theme.hairline)
-                AxisValueLabel().foregroundStyle(Theme.inkTertiary)
-            } }
-            .chartYAxis { AxisMarks { _ in AxisValueLabel().foregroundStyle(Theme.inkSecondary) } }
-            .chartLegend(position: .top, alignment: .leading)
-            .frame(height: CGFloat(rows.count) * 34 + 40)
+            .animation(.easeInOut(duration: 0.4), value: rows)
+            HStack(spacing: 16) {
+                legend("Flash", Theme.Chart.flash)
+                legend("Send", Theme.Chart.send)
+            }
         }
-        .glassCard()
+        .glassCard(padding: 18, radius: Theme.Radius.card)
+    }
+
+    private func legend(_ title: String, _ color: Color) -> some View {
+        HStack(spacing: 6) {
+            Circle().fill(color).frame(width: 8, height: 8)
+            Text(title).font(.system(size: 12)).foregroundStyle(Theme.inkSecondary)
+        }
     }
 
     // MARK: Over time
@@ -334,3 +344,79 @@ struct StatsView: View {
 }
 
 struct SessionsRoute: Hashable {}
+
+/// Seven hex cells: done grades in ramp colours, the current grade large and amber, the next one hinted.
+private struct GradeLadder: View {
+    let current: Int?
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 6) {
+            ForEach(HexGrade.allCases) { grade in
+                cell(grade.rawValue)
+                    .frame(maxWidth: .infinity)
+            }
+        }
+        .frame(height: 46)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(current.map { "Current grade \($0) Hex of 7" } ?? "No current grade yet")
+    }
+
+    @ViewBuilder
+    private func cell(_ grade: Int) -> some View {
+        let isCurrent = grade == current
+        let isNext = grade == (current ?? 0) + 1
+        let below = current.map { grade < $0 } ?? false
+        ZStack {
+            HexCell()
+                .fill(fill(grade, isCurrent: isCurrent, isNext: isNext, below: below))
+                .shadow(color: isCurrent ? Theme.accent.opacity(0.55) : .clear, radius: 10)
+            if isCurrent || isNext {
+                Text("\(grade)")
+                    .font(.number(size: isCurrent ? 18 : 13, weight: .bold))
+                    .foregroundStyle(isCurrent ? Theme.onAccent : Theme.inkSecondary)
+            }
+        }
+        .frame(width: isCurrent ? 52 : 38, height: isCurrent ? 45 : 33)
+    }
+
+    private func fill(_ grade: Int, isCurrent: Bool, isNext: Bool, below: Bool) -> Color {
+        if isCurrent { return Theme.accent }
+        if below { return HexGrade(clamping: grade).tint }
+        if isNext { return Color.white.opacity(0.12) }
+        return Color.white.opacity(0.06)
+    }
+}
+
+/// Centred stacked bar: flash to the left, send to the right, joined at the middle.
+private struct PyramidRowView: View {
+    let row: PyramidRow
+    let widest: Int
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Text("\(row.grade) Hex")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Theme.inkSecondary)
+                .frame(width: 44, alignment: .leading)
+            GeometryReader { proxy in
+                let unit = proxy.size.width / CGFloat(widest)
+                HStack(spacing: 0) {
+                    UnevenRoundedRectangle(topLeadingRadius: 4, bottomLeadingRadius: 4, style: .continuous)
+                        .fill(Theme.Chart.flash)
+                        .frame(width: unit * CGFloat(row.flashes))
+                    UnevenRoundedRectangle(bottomTrailingRadius: 4, topTrailingRadius: 4, style: .continuous)
+                        .fill(Theme.Chart.send)
+                        .frame(width: unit * CGFloat(row.sends))
+                }
+                .frame(width: proxy.size.width)
+            }
+            .frame(height: 16)
+            Text("\(row.total)")
+                .font(.number(size: 13, weight: .semibold))
+                .foregroundStyle(Theme.ink)
+                .frame(width: 24, alignment: .trailing)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(row.grade) Hex: \(row.flashes) flashes, \(row.sends) sends")
+    }
+}

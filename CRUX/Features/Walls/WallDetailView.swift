@@ -100,7 +100,7 @@ struct WallDetailView: View {
         }
         .alert("Mark \(wall.name) as reset?", isPresented: $confirmingReset) {
             Button("Strip \(wall.activeClimbs.count) climbs", role: .destructive) {
-                withAnimation(Theme.spring) { ResetService.reset(wall, in: context) }
+                _ = withAnimation(Theme.spring) { ResetService.reset(wall, in: context) }
                 resetTick += 1
             }
             Button("Cancel", role: .cancel) {}

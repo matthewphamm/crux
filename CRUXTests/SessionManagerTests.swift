@@ -126,9 +126,9 @@ struct ResetServiceTests {
         let originalStrip = alreadyStripped.strippedAt
 
         env.work(caveClimbs[0], failures: 1, thenSend: true)
-        let count = ResetService.reset(env.wall, at: env.clock.now, in: env.context)
+        let record = ResetService.reset(env.wall, at: env.clock.now, in: env.context)
 
-        #expect(count == 2)
+        #expect(record.stripped.count == 2)
         #expect(caveClimbs.allSatisfy { !$0.isActive })
         #expect(slabClimb.isActive)
         #expect(alreadyStripped.strippedAt == originalStrip)
@@ -136,6 +136,21 @@ struct ResetServiceTests {
         #expect(env.wall.sortedResets.first?.strippedCount == 2)
         // History is kept.
         #expect(caveClimbs[0].tryCount == 2)
+    }
+
+    @Test func undoRestoresClimbsAndPreviousResetDate() {
+        let env = TestEnvironment()
+        let earlier = env.clock.now.addingTimeInterval(-86_400 * 10)
+        env.wall.lastResetAt = earlier
+        let climbs = [env.climb(), env.climb(.four)]
+
+        let record = ResetService.reset(env.wall, at: env.clock.now, in: env.context)
+        #expect(climbs.allSatisfy { !$0.isActive })
+
+        ResetService.undo(record, in: env.context)
+        #expect(climbs.allSatisfy { $0.isActive })
+        #expect(env.wall.lastResetAt == earlier)
+        #expect(env.wall.sortedResets.isEmpty)
     }
 
     @Test func daysSinceReset() {
