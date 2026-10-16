@@ -46,6 +46,7 @@ struct StatsView: View {
             }
             .nightGymBackground()
             .navigationTitle("Progress")
+            .cruxTabBar()
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { GymSwitcher(offersAllGyms: true) }
                 ToolbarItem(placement: .topBarTrailing) { SettingsToolbarButton() }

@@ -35,40 +35,67 @@ nonisolated private extension CGPoint {
     }
 }
 
-/// A hold-colored hexagon tag showing the grade as 1–7 small hexes (like Hive's wall tags), with a soft glow.
+/// A grade tag: flat-top hexagon with Hive's pip ring.
 ///
+/// `.glass` (default): dark body, hold-colour rim and pips, faint hold-colour tint.
+/// `.fill`: the original solid hold-colour body with white/dark pips.
 /// `bloom` changing plays a one-time glow bloom — used when a project is sent.
 struct HexBadge: View {
+    enum Variant { case glass, fill }
+
     let grade: HexGrade
     let color: HoldColor
     var size: CGFloat = 44
     var glowing = false
     var bloom = 0
+    var dim = false
+    var variant: Variant = .glass
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var blooming = false
 
     var body: some View {
         ZStack {
-            Hexagon()
-                .fill(
-                    LinearGradient(
-                        colors: [color.color.mix(with: .white, by: 0.12), color.color],
-                        startPoint: .top, endPoint: .bottom
+            switch variant {
+            case .glass:
+                Hexagon()
+                    .fill(Color(hex: 0x1C1D21))
+                    .padding(size * 0.01)
+                Hexagon()
+                    .fill(color.color.opacity(0.14))
+                    .padding(size * 0.05)
+                Hexagon()
+                    .stroke(rim, lineWidth: size * 0.04)
+                    .padding(size * 0.01)
+                HexPips(count: grade.rawValue, color: rim)
+            case .fill:
+                Hexagon()
+                    .fill(
+                        LinearGradient(
+                            colors: [color.color.mix(with: .white, by: 0.14), color.color],
+                            startPoint: .top, endPoint: .bottom
+                        )
                     )
+                    .padding(size * 0.01)
+                Hexagon()
+                    .stroke(Color.white.opacity(color == .black ? 0.22 : 0.18), lineWidth: size * 0.02)
+                    .padding(size * 0.01)
+                HexPips(
+                    count: grade.rawValue,
+                    color: color.prefersDarkText ? Color.black.opacity(0.78) : Color.white.opacity(0.95)
                 )
-            Hexagon()
-                .strokeBorderCompat(Color.white.opacity(color == .black ? 0.22 : 0.18), lineWidth: 1)
-            HexPips(
-                count: grade.rawValue,
-                color: color.prefersDarkText ? Color.black.opacity(0.78) : Color.white.opacity(0.95)
-            )
+            }
         }
         .frame(width: size, height: size)
-        .shadow(color: color.glow.opacity(glowing ? 0.55 : 0.28), radius: glowing ? size * 0.32 : size * 0.16)
+        .shadow(
+            color: rim.opacity(glowing ? 0.55 : 0.28),
+            radius: (glowing ? size * 0.32 : size * 0.16) * 0.6
+        )
+        .saturation(dim ? 0 : 1)
+        .opacity(dim ? 0.55 : 1)
         .overlay {
             Hexagon()
-                .stroke(color.glow, lineWidth: 2)
+                .stroke(rim, lineWidth: 2)
                 .scaleEffect(blooming ? 1.9 : 1)
                 .opacity(blooming ? 0 : (bloom > 0 ? 0.9 : 0))
                 .allowsHitTesting(false)
@@ -82,6 +109,9 @@ struct HexBadge: View {
         .accessibilityElement()
         .accessibilityLabel("\(grade.label), \(color.name)")
     }
+
+    /// Rim, pips and glow. Black holds use a cool grey so they stay visible.
+    private var rim: Color { color.glow }
 }
 
 private extension Shape {
@@ -93,7 +123,7 @@ private extension Shape {
 #Preview {
     HStack {
         ForEach(HexGrade.allCases) { grade in
-            HexBadge(grade: grade, color: HoldColor.allCases[grade.rawValue], glowing: grade == .four)
+            HexBadge(grade: grade, color: HoldColor.allCases[grade.rawValue], size: 56, glowing: grade == .four)
         }
     }
     .padding()

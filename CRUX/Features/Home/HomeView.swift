@@ -64,6 +64,7 @@ struct HomeView: View {
                 ToolbarItem(placement: .topBarTrailing) { SettingsToolbarButton() }
             }
             .logToast()
+            .cruxTabBar()
             .navigationDestination(for: Climb.self) { climb in
                 ClimbDetailView(climb: climb)
                     .navigationTransition(.zoom(sourceID: climb.id, in: namespace))

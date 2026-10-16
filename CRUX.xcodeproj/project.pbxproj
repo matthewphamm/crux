@@ -56,6 +56,7 @@
 		E20176F52936C11629DD5E61 /* ClimbsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF16213649E5B1771A45CEE /* ClimbsView.swift */; };
 		E3F056D1AE880BC077EB3FF1 /* ClimbSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF7611A8C4D2643B40F6303B /* ClimbSession.swift */; };
 		E7A98BDC4FB7604285F0E14F /* GradingAndStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0B9BC93C63B258FF39A63E /* GradingAndStatusTests.swift */; };
+		EA11C19986CD6452DB7FFF1A /* CruxTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2FBCB952AC1404A5872C091 /* CruxTabBar.swift */; };
 		EA3195E45383C6B0597FE419 /* StatsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37A38476DD88ACC68CCD0BB /* StatsServiceTests.swift */; };
 		ECAA88D14330B37A0C72D7E1 /* SeedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE4CC987D658F58E9F4A9621 /* SeedData.swift */; };
 		EF15FB65426AACC51F7F7FAF /* ProjectSendHaptic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0525945B0D35936CD97C734B /* ProjectSendHaptic.swift */; };
@@ -119,6 +120,7 @@
 		B27347B6D288310F514EA02E /* BetaMedia.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BetaMedia.swift; sourceTree = "<group>"; };
 		B6E5C9B69834634BE4353F42 /* HexBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HexBadge.swift; sourceTree = "<group>"; };
 		B735B8860818CF16EFB438AA /* Wall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wall.swift; sourceTree = "<group>"; };
+		C2FBCB952AC1404A5872C091 /* CruxTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CruxTabBar.swift; sourceTree = "<group>"; };
 		C8E98FBD15ABC51A75532BA5 /* SessionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManagerTests.swift; sourceTree = "<group>"; };
 		C98DA918590099E668E5BEA4 /* ClimbPickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbPickerSheet.swift; sourceTree = "<group>"; };
 		CD8C20473C46ED79D1EC2E23 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
@@ -351,6 +353,7 @@
 			children = (
 				CD8C20473C46ED79D1EC2E23 /* AppModel.swift */,
 				EED35727C2195A9DAD1B3A4E /* CRUXApp.swift */,
+				C2FBCB952AC1404A5872C091 /* CruxTabBar.swift */,
 				716F1E98F38CFAA9727B8737 /* LogCoordinator.swift */,
 				D74BC59F860C4166DBD3223A /* RootTabView.swift */,
 			);
@@ -487,6 +490,7 @@
 				E3F056D1AE880BC077EB3FF1 /* ClimbSession.swift in Sources */,
 				E20176F52936C11629DD5E61 /* ClimbsView.swift in Sources */,
 				0A8CFA00FF8B56601E8686A6 /* Components.swift in Sources */,
+				EA11C19986CD6452DB7FFF1A /* CruxTabBar.swift in Sources */,
 				BAEB433E603AC056FFC2F990 /* Gym.swift in Sources */,
 				D448473DF11F7F692AC49591 /* GymDetailView.swift in Sources */,
 				CED13F1170F47BD0B77BD94E /* GymLocator.swift in Sources */,

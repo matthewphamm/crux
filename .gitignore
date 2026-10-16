@@ -12,3 +12,6 @@ Config/Local.xcconfig
 
 # macOS
 .DS_Store
+
+# Local tooling
+.claude/

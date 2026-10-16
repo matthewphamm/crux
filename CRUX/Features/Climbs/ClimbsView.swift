@@ -51,6 +51,7 @@ struct ClimbsView: View {
             .nightGymBackground()
             .navigationTitle("Climbs")
             .searchable(text: $query, prompt: "Search climbs")
+            .cruxTabBar()
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { GymSwitcher() }
                 ToolbarItemGroup(placement: .topBarTrailing) {

@@ -34,6 +34,7 @@ struct WallsView: View {
             }
             .nightGymBackground()
             .navigationTitle("Walls")
+            .cruxTabBar()
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { GymSwitcher() }
                 ToolbarItemGroup(placement: .topBarTrailing) {

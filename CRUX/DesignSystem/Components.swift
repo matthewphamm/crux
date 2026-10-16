@@ -1,37 +1,100 @@
 import SwiftUI
 
-// MARK: - Glass card
+// MARK: - Card
 
 extension View {
-    /// A Liquid Glass panel with the standard card radius and padding.
-    func glassCard(padding: CGFloat = 16, tint: Color? = nil, interactive: Bool = false) -> some View {
-        self
+    /// The standard card: a faint white fill with a 1pt hairline border.
+    /// `tint` recolours fill and border (e.g. green for topped climbs, red for stripped).
+    func glassCard(padding: CGFloat = 16, tint: Color? = nil, radius: CGFloat = Theme.Radius.row, interactive: Bool = false) -> some View {
+        let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
+        return self
             .padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .glassEffect(
-                interactive ? Glass.regular.tint(tint?.opacity(0.18)).interactive() : Glass.regular.tint(tint?.opacity(0.18)),
-                in: .rect(cornerRadius: Theme.Radius.card)
-            )
+            .background(shape.fill(tint.map { $0.opacity(0.08) } ?? Theme.cardFill))
+            .overlay(shape.strokeBorder(tint.map { $0.opacity(0.22) } ?? Theme.cardBorder, lineWidth: 1))
+    }
+
+    /// Control style: round toolbar buttons, the gym pill, secondary buttons.
+    func controlBackground<S: InsettableShape>(_ shape: S) -> some View {
+        background(shape.fill(Theme.controlFill))
+            .overlay(shape.strokeBorder(Theme.controlBorder, lineWidth: 1))
+    }
+}
+
+// MARK: - Buttons
+
+/// Full-width 52pt amber button ("+ Start session", "Resume", "New climb").
+struct AccentButtonStyle: ButtonStyle {
+    var height: CGFloat = 52
+    var fill: Color = Theme.accent
+    var ink: Color = Theme.onAccent
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 17, weight: .bold))
+            .foregroundStyle(ink)
+            .frame(maxWidth: .infinity, minHeight: height)
+            .background(Capsule().fill(fill))
+            .shadow(color: fill.opacity(0.35), radius: 12, y: 4)
+            .opacity(configuration.isPressed ? 0.85 : 1)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
+/// Full-width 52pt control-style button ("End", "From the wall", "+ Attempt").
+struct ControlButtonStyle: ButtonStyle {
+    var height: CGFloat = 52
+    var ink: Color = Theme.ink
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 17, weight: .semibold))
+            .foregroundStyle(ink)
+            .frame(maxWidth: .infinity, minHeight: height)
+            .controlBackground(Capsule())
+            .opacity(configuration.isPressed ? 0.75 : 1)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
+/// Small pill: "End", "Done", "Reset", "Star".
+struct PillButtonStyle: ButtonStyle {
+    var tint: Color = Theme.accent
+    var filled = false
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 15, weight: .semibold))
+            .foregroundStyle(filled ? Theme.onAccent : tint)
+            .padding(.horizontal, 14)
+            .frame(minHeight: 36)
+            .background(Capsule().fill(filled ? tint : tint.opacity(0.14)))
+            .overlay(Capsule().strokeBorder(filled ? .clear : tint.opacity(0.3), lineWidth: 1))
+            .opacity(configuration.isPressed ? 0.75 : 1)
     }
 }
 
 // MARK: - Section header
 
+/// 13 / 600, uppercase, +0.8 tracking, secondary colour.
 struct SectionHeader: View {
     let title: String
     var trailing: String?
+    var color: Color = Theme.inkSecondary
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             Text(title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(Theme.inkSecondary)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(color)
                 .textCase(.uppercase)
                 .tracking(0.8)
             Spacer()
             if let trailing {
                 Text(trailing)
-                    .font(.footnote)
+                    .font(.system(size: 13))
                     .foregroundStyle(Theme.inkTertiary)
             }
         }
@@ -46,6 +109,8 @@ struct StatTile: View {
     let caption: String
     var tint: Color = Theme.ink
     var symbol: String?
+    /// Colour the number itself (sends in green, hardest in amber).
+    var tintsValue = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -56,18 +121,18 @@ struct StatTile: View {
                         .foregroundStyle(tint.opacity(0.9))
                 }
                 Text(value)
-                    .font(.number(.title2))
-                    .foregroundStyle(Theme.ink)
+                    .font(.number(size: 24))
+                    .foregroundStyle(tintsValue ? tint : Theme.ink)
                     .contentTransition(.numericText())
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
             }
             Text(caption)
-                .font(.caption)
+                .font(.system(size: 12))
                 .foregroundStyle(Theme.inkSecondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .glassCard(padding: 14)
+        .glassCard(padding: 14, radius: 20)
         .accessibilityElement(children: .combine)
     }
 }
@@ -80,14 +145,12 @@ struct TagPill: View {
 
     var body: some View {
         Text(text)
-            .font(.caption.weight(.medium))
-            .foregroundStyle(isSelected ? Theme.accent : Theme.inkSecondary)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .background(
-                Capsule().fill(isSelected ? Theme.accent.opacity(0.16) : Theme.surfaceRaised.opacity(0.7))
-            )
-            .overlay(Capsule().stroke(isSelected ? Theme.accent.opacity(0.5) : .clear, lineWidth: 1))
+            .font(.system(size: 14, weight: .medium))
+            .foregroundStyle(isSelected ? Theme.accent : Theme.ink.opacity(0.85))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .background(Capsule().fill(isSelected ? Theme.accent.opacity(0.16) : Theme.controlFill))
+            .overlay(Capsule().strokeBorder(isSelected ? Theme.accent.opacity(0.5) : Theme.controlBorder, lineWidth: 1))
     }
 }
 
@@ -98,7 +161,7 @@ struct StatusLabel: View {
 
     var body: some View {
         Label(status.name, systemImage: status.symbol)
-            .font(.caption.weight(.medium))
+            .font(.system(size: 12, weight: .semibold))
             .foregroundStyle(color)
             .labelStyle(.titleAndIcon)
     }
@@ -174,25 +237,33 @@ struct ToastView: View {
     let toast: Toast
     let onUndo: () -> Void
 
+    @State private var popped = false
+
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: toast.symbol)
-                .font(.subheadline.weight(.semibold))
+                .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(toast.tint)
             Text(toast.message)
-                .font(.subheadline)
+                .font(.system(size: 15, weight: .medium))
                 .foregroundStyle(Theme.ink)
-                .lineLimit(2)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
             Spacer(minLength: 8)
             if toast.undo {
                 Button("Undo", action: onUndo)
-                    .font(.subheadline.weight(.semibold))
+                    .font(.system(size: 15, weight: .bold))
                     .foregroundStyle(Theme.accent)
             }
         }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 14)
-        .glassEffect(.regular, in: .capsule)
+        .padding(.horizontal, 20)
+        .frame(height: 52)
+        .background(Capsule().fill(Color(hex: 0x2C2D32, opacity: 0.94)))
+        .background(.ultraThinMaterial, in: .capsule)
+        .overlay(Capsule().strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
+        .shadow(color: .black.opacity(0.4), radius: 16, y: 8)
+        .scaleEffect(popped ? 1 : 1.08)
+        .onAppear { withAnimation(.easeOut(duration: 0.25)) { popped = true } }
         .padding(.horizontal, Theme.Spacing.gutter)
     }
 }

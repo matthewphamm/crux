@@ -6,7 +6,6 @@ struct CRUXApp: App {
     @State private var app: AppModel
     @State private var logger: LogCoordinator
     @State private var gymMenu = GymMenuState()
-    @AppStorage(Appearance.storageKey) private var appearance: Appearance = .dark
 
     init() {
         let isTesting = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
@@ -25,7 +24,7 @@ struct CRUXApp: App {
                 .environment(logger)
                 .environment(gymMenu)
                 .modelContainer(app.container)
-                .preferredColorScheme(appearance.colorScheme)
+                .preferredColorScheme(.dark)
                 .tint(Theme.accent)
         }
     }
