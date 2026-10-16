@@ -20,7 +20,7 @@ struct LiveSessionView: View {
 
     var body: some View {
         if let ended {
-            SessionDetailView(session: ended, isSummary: true)
+            SessionSummaryView(session: ended)
                 .transition(.opacity)
         } else {
             live

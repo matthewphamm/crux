@@ -291,6 +291,18 @@ enum Format {
         seconds < 60 ? "\(Int(seconds)) sec" : "\(Int(seconds / 60)) min"
     }
 
+    /// "1 try", "3 tries".
+    static func tries(_ value: Int) -> String {
+        value == 1 ? "1 try" : "\(value) tries"
+    }
+
+    /// "Today", "Yesterday", or "Tue, Oct 14".
+    static func relativeDay(_ date: Date, calendar: Calendar = .current) -> String {
+        if calendar.isDateInToday(date) { return "Today" }
+        if calendar.isDateInYesterday(date) { return "Yesterday" }
+        return date.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day())
+    }
+
     /// "1 send", "3 sends".
     static func count(_ value: Int, _ noun: String) -> String {
         "\(value) \(noun)\(value == 1 ? "" : "s")"

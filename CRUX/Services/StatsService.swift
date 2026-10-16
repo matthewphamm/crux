@@ -285,6 +285,20 @@ enum StatsService {
         )
     }
 
+    /// Sends in `session` versus the average of up to `window` finished sessions before it.
+    static func sendComparison(
+        for session: ClimbSession, among sessions: [ClimbSession], window: Int = 5
+    ) -> (delta: Int, average: Double, count: Int)? {
+        let previous = sessions
+            .filter { $0.id != session.id && $0.startedAt < session.startedAt && !$0.isOpen }
+            .sorted { $0.startedAt > $1.startedAt }
+            .prefix(window)
+        guard !previous.isEmpty else { return nil }
+        let average = Double(previous.map { ($0.attempts ?? []).filter(\.isSend).count }.reduce(0, +)) / Double(previous.count)
+        let sends = (session.attempts ?? []).filter(\.isSend).count
+        return (Int((Double(sends) - average).rounded()), average, previous.count)
+    }
+
     /// "+3 sends vs your last 5 sessions", comparing against the sessions just before this one.
     static func comparison(for session: ClimbSession, among sessions: [ClimbSession], window: Int = 5) -> String? {
         let previous = sessions

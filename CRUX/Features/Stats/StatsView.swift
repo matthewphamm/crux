@@ -51,7 +51,7 @@ struct StatsView: View {
                 ToolbarItem(placement: .topBarLeading) { GymSwitcher(offersAllGyms: true) }
                 ToolbarItem(placement: .topBarTrailing) { SettingsToolbarButton() }
             }
-            .navigationDestination(for: ClimbSession.self) { SessionDetailView(session: $0) }
+            .navigationDestination(for: ClimbSession.self) { SessionSummaryView(session: $0, isCover: false) }
             .navigationDestination(for: SessionsRoute.self) { _ in SessionsListView(sessions: gymSessions) }
             .cruxFeedback(.selection, trigger: range)
         }

@@ -20,7 +20,7 @@ struct CruxTabBar: View {
             item(.climbs, "Climbs", "list.bullet")
             start
             item(.walls, "Walls", "square.3.layers.3d")
-            item(.stats, "Stats", "chart.bar")
+            item(.stats, "Stats", "chart.bar.xaxis")
         }
         .padding(.horizontal, 6)
         .frame(height: 64)
