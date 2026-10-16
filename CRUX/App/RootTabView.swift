@@ -99,7 +99,15 @@ struct SettingsToolbarButton: View {
     @State private var showing = false
 
     var body: some View {
-        Button("Settings", systemImage: "gearshape") { showing = true }
-            .sheet(isPresented: $showing) { SettingsView() }
+        Button { showing = true } label: {
+            Image(systemName: "gearshape")
+                .font(.system(size: 17, weight: .medium))
+                .foregroundStyle(Theme.accent)
+                .frame(width: 40, height: 40)
+                .controlBackground(Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Settings")
+        .fullScreenCover(isPresented: $showing) { SettingsView() }
     }
 }

@@ -19,7 +19,8 @@ struct SettingsCard<Content: View>: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .glassEffect(.regular, in: .rect(cornerRadius: Theme.Radius.card))
+        .background(RoundedRectangle(cornerRadius: Theme.Radius.row, style: .continuous).fill(Theme.cardFill))
+        .overlay(RoundedRectangle(cornerRadius: Theme.Radius.row, style: .continuous).strokeBorder(Theme.cardBorder, lineWidth: 1))
     }
 }
 
@@ -102,10 +103,11 @@ struct GlassStepper: View {
         } label: {
             Image(systemName: symbol)
                 .font(.caption.weight(.bold))
-                .frame(width: 22, height: 22)
+                .foregroundStyle(enabled ? Theme.accent : Theme.inkTertiary)
+                .frame(width: 32, height: 32)
+                .controlBackground(Circle())
         }
-        .buttonStyle(.glass)
-        .buttonBorderShape(.circle)
+        .buttonStyle(.plain)
         .disabled(!enabled)
     }
 }

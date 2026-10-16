@@ -236,11 +236,9 @@ struct ClimbEditorSheet: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.stack) {
             SectionHeader(title: "Beta", trailing: mediaItems.isEmpty ? "Optional" : "\(mediaItems.count) attached")
             PhotosPicker(selection: $mediaItems, maxSelectionCount: 6, matching: .any(of: [.images, .videos])) {
-                Label("Add photos or videos", systemImage: "photo.on.rectangle.angled")
-                    .frame(maxWidth: .infinity)
+                Label("Add photos or videos", systemImage: "photo.on.rectangle")
             }
-            .buttonStyle(.glass)
-            .controlSize(.large)
+            .buttonStyle(ControlButtonStyle(height: 44, ink: Theme.accent))
         }
     }
 

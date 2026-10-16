@@ -5,7 +5,7 @@
 It's built around the **Hex grading system** used at [Hive Climbing](https://hiveclimbing.com/climb-overview) in Metro Vancouver.
 
 <p align="center">
-  <img src="docs/screenshots/log.png" width="200" alt="Quick log with a live session">
+  <img src="docs/screenshots/home.png" width="200" alt="Home: this week and projects">
   <img src="docs/screenshots/stats.png" width="200" alt="Progress dashboard">
   <img src="docs/screenshots/climbs.png" width="200" alt="Climbs and filters">
   <img src="docs/screenshots/walls.png" width="200" alt="Walls and resets">
@@ -44,7 +44,7 @@ It's built around the **Hex grading system** used at [Hive Climbing](https://hiv
 - **Beta**: notes, plus photos and videos from the library or camera. Videos appear on the session timeline.
 
 **Feel**
-- A *Night Gym* design: dark-first, iOS 26 Liquid Glass, and a hexagon tag tinted with the hold color that shows the grade like Hive's wall tags: a ring of six hexes filled in one per grade, with a centre hex for 7.
+- A *Night Gym* design (dark only), with a floating tab bar, and a hexagon tag tinted with the hold color that shows the grade like Hive's wall tags: a ring of six hexes filled in one per grade, with a centre hex for 7.
 - Subtle springs, numeric content transitions, zoom navigation transitions, and Reduce Motion fallbacks.
 - Haptics throughout, plus a custom **Core Haptics** pattern when you finish a project: three rising taps, then a warm swell.
 

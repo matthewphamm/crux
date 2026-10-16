@@ -141,7 +141,7 @@ struct GymDetailView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
-            .glassEffect(.regular.interactive(), in: .capsule)
+            .controlBackground(Capsule())
 
             if !results.isEmpty {
                 SettingsCard {
@@ -178,11 +178,8 @@ struct GymDetailView: View {
             confirmingDelete = true
         } label: {
             Label("Delete gym", systemImage: "trash")
-                .frame(maxWidth: .infinity)
         }
-        .buttonStyle(.glass)
-        .controlSize(.large)
-        .tint(Color(hex: 0xE5534B))
+        .buttonStyle(ControlButtonStyle(ink: Theme.danger))
     }
 
     // MARK: Actions

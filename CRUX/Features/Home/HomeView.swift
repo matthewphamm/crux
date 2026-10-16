@@ -43,7 +43,9 @@ struct HomeView: View {
             .navigationTitle("CRUX.")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { GymSwitcher() }
+                    .sharedBackgroundVisibility(.hidden)
                 ToolbarItem(placement: .topBarTrailing) { SettingsToolbarButton() }
+                    .sharedBackgroundVisibility(.hidden)
             }
             .cruxTabBar()
             .logToast()
@@ -261,7 +263,9 @@ private struct WeekCard: View {
     private var lastLine: String {
         guard let last = sessions.first else { return "No sessions yet" }
         let sends = (last.attempts ?? []).filter(\.isSend).count
-        return "Last: \(Format.relativeDay(last.startedAt).lowercased()) · \(Format.count(sends, "send"))"
+        let day = Format.relativeDay(last.startedAt)
+        let label = day == "Today" || day == "Yesterday" ? day.lowercased() : day
+        return "Last: \(label) · \(Format.count(sends, "send"))"
     }
 }
 

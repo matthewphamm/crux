@@ -29,19 +29,26 @@ struct GymSwitcher: View {
             withAnimation(GymMenuOverlay.spring) { menu.toggle(offersAllGyms: offersAllGyms) }
         } label: {
             HStack(spacing: 6) {
-                Image(systemName: showsAll ? "square.grid.2x2.fill" : "mappin.circle.fill")
+                Image(systemName: showsAll ? "square.grid.2x2" : "mappin")
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Theme.accent)
                 Text(title)
-                    .font(.subheadline.weight(.semibold))
+                    .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(Theme.ink)
                     .lineLimit(1)
+                    .truncationMode(.tail)
                 Image(systemName: "chevron.down")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(Theme.inkTertiary)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(Theme.inkSecondary)
                     .rotationEffect(.degrees(menu.isOpen ? 180 : 0))
             }
-            .padding(.horizontal, 4)
+            .padding(.horizontal, 14)
+            .frame(height: 38)
+            .frame(maxWidth: 250)
+            .fixedSize(horizontal: true, vertical: false)
+            .controlBackground(Capsule())
         }
+        .buttonStyle(.plain)
         .accessibilityLabel("Gym: \(title)")
         .accessibilityHint(menu.isOpen ? "Closes the gym list" : "Shows your gyms")
     }
@@ -55,7 +62,7 @@ struct GymSwitcher: View {
 
 /// The floating Liquid Glass card listing your gyms. Attached once, at the root.
 struct GymMenuOverlay: View {
-    static let spring = Animation.spring(response: 0.36, dampingFraction: 0.82)
+    static let spring = Animation.easeOut(duration: 0.22)
 
     @Environment(GymMenuState.self) private var menu
     @Environment(AppModel.self) private var app
@@ -81,9 +88,8 @@ struct GymMenuOverlay: View {
                     .padding(.leading, Theme.Spacing.gutter)
                     .padding(.top, 50)
                     .transition(
-                        .scale(scale: 0.55, anchor: .topLeading)
+                        .scale(scale: 0.85, anchor: .topLeading)
                             .combined(with: .opacity)
-                            .combined(with: .offset(y: -12))
                     )
             }
         }
@@ -98,7 +104,7 @@ struct GymMenuOverlay: View {
             Button("Add") { addGym() }
             Button("Cancel", role: .cancel) { newGymName = "" }
         } message: {
-            Text("It starts with four placeholder walls you can rename.")
+            Text("It starts with \(AppModel.defaultWallNames.dropLast().joined(separator: ", ")) and \(AppModel.defaultWallNames.last ?? ""). Rename them any time.")
         }
     }
 
@@ -163,7 +169,7 @@ struct GymMenuOverlay: View {
                     close()
                     showingNewGym = true
                 }
-                footerButton("Manage", systemImage: "slider.horizontal.3") {
+                footerButton("Manage gyms", systemImage: "slider.horizontal.3") {
                     close()
                     showingManage = true
                 }
@@ -171,9 +177,11 @@ struct GymMenuOverlay: View {
             .padding(.horizontal, 10)
             .padding(.bottom, 12)
         }
-        .frame(width: 292)
-        .glassEffect(.regular.tint(Theme.background.opacity(0.55)), in: .rect(cornerRadius: 26))
-        .shadow(color: .black.opacity(0.35), radius: 24, y: 12)
+        .frame(width: 290)
+        .background(RoundedRectangle(cornerRadius: 26, style: .continuous).fill(Color(hex: 0x28292E, opacity: 0.94)))
+        .background(.ultraThinMaterial, in: .rect(cornerRadius: 26))
+        .overlay(RoundedRectangle(cornerRadius: 26, style: .continuous).strokeBorder(Color.white.opacity(0.08), lineWidth: 1))
+        .shadow(color: .black.opacity(0.55), radius: 25, y: 20)
         .accessibilityElement(children: .contain)
         .accessibilityAddTraits(.isModal)
         .accessibilityAction(.escape) { close() }
@@ -221,13 +229,15 @@ struct GymMenuOverlay: View {
     private func footerButton(_ title: String, systemImage: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Label(title, systemImage: systemImage)
-                .font(.subheadline.weight(.medium))
+                .font(.system(size: 14, weight: .semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
                 .foregroundStyle(Theme.ink)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
         }
         .buttonStyle(.plain)
-        .glassEffect(.regular.interactive(), in: .capsule)
+        .controlBackground(Capsule())
     }
 
     private func subtitle(for gym: Gym) -> String {

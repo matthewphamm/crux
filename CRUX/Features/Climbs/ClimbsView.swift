@@ -52,7 +52,9 @@ struct ClimbsView: View {
             .cruxTabBar()
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { GymSwitcher() }
+                    .sharedBackgroundVisibility(.hidden)
                 ToolbarItem(placement: .topBarTrailing) { SettingsToolbarButton() }
+                    .sharedBackgroundVisibility(.hidden)
             }
             .navigationDestination(for: Climb.self) { climb in
                 ClimbDetailView(climb: climb)

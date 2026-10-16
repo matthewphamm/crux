@@ -78,6 +78,19 @@ struct PillButtonStyle: ButtonStyle {
     }
 }
 
+/// 36pt round control-style icon button (calendar chevrons and similar).
+struct RoundIconButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundStyle(isEnabled ? Theme.accent : Theme.inkTertiary)
+            .frame(width: 36, height: 36)
+            .controlBackground(Circle())
+            .opacity(configuration.isPressed ? 0.7 : 1)
+    }
+}
+
 // MARK: - Section header
 
 /// 13 / 600, uppercase, +0.8 tracking, secondary colour.

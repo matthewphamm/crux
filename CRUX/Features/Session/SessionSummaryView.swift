@@ -22,6 +22,7 @@ struct SessionSummaryView: View {
                             Button("Done") { dismiss() }
                                 .buttonStyle(PillButtonStyle(filled: true))
                         }
+                        .sharedBackgroundVisibility(.hidden)
                     }
                     .navigationDestination(for: Climb.self) { ClimbDetailView(climb: $0) }
             }

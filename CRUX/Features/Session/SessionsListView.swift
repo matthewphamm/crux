@@ -83,8 +83,7 @@ struct SessionsListView: View {
             }
             .labelStyle(.iconOnly)
             .font(.subheadline.weight(.semibold))
-            .buttonStyle(.glass)
-            .buttonBorderShape(.circle)
+            .buttonStyle(RoundIconButtonStyle())
         }
     }
 

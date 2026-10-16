@@ -27,11 +27,9 @@ struct WallDetailView: View {
                     Button {
                         confirmingReset = true
                     } label: {
-                        Label("Mark reset", systemImage: "arrow.counterclockwise")
-                            .frame(maxWidth: .infinity)
+                        Label("Reset wall", systemImage: "arrow.counterclockwise")
                     }
-                    .buttonStyle(.glassProminent)
-                    .controlSize(.large)
+                    .buttonStyle(ControlButtonStyle(ink: Theme.accent))
                     .padding(.top, 10)
                     .disabled(wall.activeClimbs.isEmpty)
                 }

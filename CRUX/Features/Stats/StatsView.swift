@@ -51,7 +51,9 @@ struct StatsView: View {
             .cruxTabBar()
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { GymSwitcher(offersAllGyms: true) }
+                    .sharedBackgroundVisibility(.hidden)
                 ToolbarItem(placement: .topBarTrailing) { SettingsToolbarButton() }
+                    .sharedBackgroundVisibility(.hidden)
             }
             .navigationDestination(for: ClimbSession.self) { SessionSummaryView(session: $0, isCover: false) }
             .navigationDestination(for: SessionsRoute.self) { _ in SessionsListView(sessions: gymSessions) }
@@ -186,7 +188,7 @@ struct StatsView: View {
                                 Text("\(total) sends").font(.caption.weight(.semibold)).foregroundStyle(Theme.ink)
                             }
                             .padding(.horizontal, 8).padding(.vertical, 4)
-                            .glassEffect(.regular, in: .rect(cornerRadius: 10))
+                            .background(RoundedRectangle(cornerRadius: 10).fill(Color(hex: 0x2C2D32)))
                         }
                 }
             }

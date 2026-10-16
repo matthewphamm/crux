@@ -41,20 +41,3 @@ struct CRUXApp: App {
         }
     }
 }
-
-enum Appearance: String, CaseIterable, Identifiable {
-    case dark, light, system
-
-    static let storageKey = "app.appearance"
-
-    var id: String { rawValue }
-    var label: String { rawValue.capitalized }
-
-    var colorScheme: ColorScheme? {
-        switch self {
-        case .dark: .dark
-        case .light: .light
-        case .system: nil
-        }
-    }
-}

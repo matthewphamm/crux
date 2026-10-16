@@ -9,7 +9,6 @@ struct SettingsView: View {
     @Environment(SessionManager.self) private var sessions
     @Query(sort: \Gym.createdAt) private var gyms: [Gym]
 
-    @AppStorage(Appearance.storageKey) private var appearance: Appearance = .dark
     @AppStorage(HapticsService.enabledKey) private var hapticsEnabled = true
     @AppStorage(AppModel.autoSwitchKey) private var autoSwitchGym = false
     @State private var showingNewGym = false
@@ -22,14 +21,21 @@ struct SettingsView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: Theme.Spacing.section) {
                     gymsSection
-                    autoSwitchSection(isOn: $autoSwitchGym)
                     sessionsSection(minutes: $config.timeoutMinutes)
-                    feelSection
                     gradesSection
                     #if DEBUG
                     DeveloperSection()
                     #endif
-                    about
+                    Text("CRUX. keeps everything on this iPhone. No account, no backend.")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Theme.inkTertiary)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 4)
+                    Text("Version \(Bundle.main.versionString)")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.inkTertiary)
+                        .frame(maxWidth: .infinity)
                 }
                 .padding(.horizontal, Theme.Spacing.gutter)
                 .padding(.top, 8)
@@ -37,20 +43,21 @@ struct SettingsView: View {
             }
             .nightGymBackground()
             .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.large)
             .navigationDestination(for: Gym.self) { GymDetailView(gym: $0) }
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done", systemImage: "checkmark") { dismiss() }
-                        .buttonStyle(.glassProminent)
+                    Button("Done") { dismiss() }
+                        .buttonStyle(PillButtonStyle(filled: true))
                 }
+                .sharedBackgroundVisibility(.hidden)
             }
             .alert("New gym", isPresented: $showingNewGym) {
                 TextField("e.g. Hive Surrey", text: $newGymName)
-                Button("Add") { addGym() }
                 Button("Cancel", role: .cancel) { newGymName = "" }
+                Button("Add") { addGym() }
             } message: {
-                Text("It starts with four placeholder walls you can rename.")
+                Text("It starts with \(AppModel.defaultWallNames.dropLast().joined(separator: ", ")) and \(AppModel.defaultWallNames.last ?? ""). Rename them any time.")
             }
             .onChange(of: config.timeoutMinutes) { sessions.refresh() }
             .cruxFeedback(.selection, trigger: gymTick)
@@ -62,33 +69,50 @@ struct SettingsView: View {
     private var gymsSection: some View {
         SettingsCard {
             ForEach(gyms) { gym in
+                let isCurrent = gym.id == app.currentGym?.id
                 HStack(spacing: 0) {
                     Button {
-                        guard gym.id != app.currentGym?.id else { return }
+                        guard !isCurrent else { return }
                         withAnimation(Theme.spring) { _ = app.select(gym) }
                         gymTick += 1
                     } label: {
-                        SettingsRow(
-                            icon: gym.id == app.currentGym?.id ? "mappin.circle.fill" : "mappin.circle",
-                            tint: gym.id == app.currentGym?.id ? Theme.accent : Theme.inkTertiary,
-                            title: gym.name,
-                            subtitle: subtitle(for: gym)
-                        ) {
-                            if gym.id == app.currentGym?.id {
-                                Text("Here")
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(Theme.accent)
-                                    .padding(.horizontal, 8).padding(.vertical, 3)
-                                    .background(Theme.accent.opacity(0.14), in: .capsule)
+                        HStack(spacing: 14) {
+                            Image(systemName: "mappin")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundStyle(isCurrent ? Theme.onAccent : Theme.inkSecondary)
+                                .frame(width: 36, height: 36)
+                                .background(Circle().fill(isCurrent ? Theme.accent : Theme.controlFill))
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack(spacing: 8) {
+                                    Text(gym.name)
+                                        .font(.system(size: 16, weight: .semibold))
+                                        .foregroundStyle(Theme.ink)
+                                        .lineLimit(1)
+                                    if isCurrent {
+                                        Text("Here")
+                                            .font(.system(size: 11, weight: .bold))
+                                            .foregroundStyle(Theme.accent)
+                                            .padding(.horizontal, 7).padding(.vertical, 2)
+                                            .background(Theme.accent.opacity(0.16), in: .capsule)
+                                    }
+                                }
+                                Text(subtitle(for: gym))
+                                    .font(.system(size: 13))
+                                    .foregroundStyle(Theme.inkSecondary)
+                                    .lineLimit(1)
                             }
+                            Spacer(minLength: 8)
                         }
+                        .padding(.leading, 16)
+                        .padding(.vertical, 12)
+                        .contentShape(.rect)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityAddTraits(gym.id == app.currentGym?.id ? .isSelected : [])
+                    .accessibilityAddTraits(isCurrent ? .isSelected : [])
 
                     NavigationLink(value: gym) {
                         Image(systemName: "chevron.right")
-                            .font(.footnote.weight(.semibold))
+                            .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(Theme.inkTertiary)
                             .frame(width: 44, height: 44)
                             .contentShape(.rect)
@@ -98,58 +122,23 @@ struct SettingsView: View {
                 }
             }
             Button { showingNewGym = true } label: {
-                SettingsRow(icon: "plus", tint: Theme.inkSecondary, title: "Add gym")
+                Label("Add gym", systemImage: "plus")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(Theme.accent)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .frame(minHeight: 50)
+                    .contentShape(.rect)
             }
             .buttonStyle(.plain)
         }
-        .settingsSection("Gyms", footer: "Tap a gym to climb there. Log, Climbs, Walls and Stats follow the gym you pick.")
+        .settingsSection("Gyms")
     }
 
     private func subtitle(for gym: Gym) -> String {
         let walls = gym.walls?.count ?? 0
         let place = gym.location == nil ? "No location" : (gym.address.isEmpty ? "Location set" : gym.address)
-        return "\(walls) walls · \(place)"
-    }
-
-    private func autoSwitchSection(isOn: Binding<Bool>) -> some View {
-        let located = gyms.filter { $0.location != nil }.count
-        return SettingsCard {
-            SettingsRow(
-                icon: "location.fill",
-                title: "Auto-switch gym",
-                subtitle: autoSwitchSubtitle(located: located)
-            ) {
-                Toggle("Switch gym automatically", isOn: Binding(
-                    get: { isOn.wrappedValue },
-                    set: { newValue in
-                        isOn.wrappedValue = newValue
-                        if newValue, app.locator.authorization == .notDetermined { app.locator.requestPermission() }
-                    }
-                ))
-                .labelsHidden()
-            }
-            if isOn.wrappedValue && app.locator.isDenied {
-                Button {
-                    if let url = URL(string: "app-settings:") { openURL(url) }
-                } label: {
-                    SettingsRow(icon: "exclamationmark.triangle.fill", tint: Color(hex: 0xEC8350),
-                                title: "Location access is off", subtitle: "Allow “While Using” in iOS Settings.") {
-                        Image(systemName: "arrow.up.right").font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkTertiary)
-                    }
-                }
-                .buttonStyle(.plain)
-            }
-        }
-        .settingsSection("Arriving", footer: "Checked once when you open CRUX. and never during a session. Your location stays on this iPhone.")
-        .animation(Theme.spring, value: isOn.wrappedValue)
-    }
-
-    private func autoSwitchSubtitle(located: Int) -> String {
-        switch located {
-        case 0: "Add a location to a gym first"
-        case 1: "1 gym has a location"
-        default: "\(located) gyms have a location"
-        }
+        return "\(Format.count(walls, "wall")) · \(place)"
     }
 
     private func addGym() {
@@ -164,34 +153,45 @@ struct SettingsView: View {
     // MARK: Sessions
 
     private func sessionsSection(minutes: Binding<Int>) -> some View {
-        SettingsCard {
-            SettingsRow(icon: "timer", title: "Auto-end", subtitle: "after this long without a log") {
+        let located = gyms.filter { $0.location != nil }.count
+        return SettingsCard {
+            SettingsRow(icon: "timer", title: "Auto-end after", subtitle: "With no logs for this long") {
                 GlassStepper(value: minutes, range: SessionConfig.timeoutRange, step: 15) { "\($0) min" }
             }
-        }
-        .settingsSection("Sessions", footer: "A session starts with your first log and ends at your last one once you've been quiet this long.")
-    }
-
-    // MARK: Feel
-
-    private var feelSection: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 10) {
-                ForEach(Appearance.allCases) { option in
-                    AppearanceTile(option: option, isSelected: appearance == option) {
-                        withAnimation(Theme.spring) { appearance = option }
+            SettingsRow(
+                icon: "location",
+                title: "Switch gym automatically",
+                subtitle: located == 1 ? "1 gym has a location" : "\(located) gyms have a location"
+            ) {
+                Toggle("Switch gym automatically", isOn: Binding(
+                    get: { autoSwitchGym },
+                    set: { newValue in
+                        autoSwitchGym = newValue
+                        if newValue, app.locator.authorization == .notDetermined { app.locator.requestPermission() }
+                    }
+                ))
+                .labelsHidden()
+                .tint(Theme.accent)
+            }
+            if autoSwitchGym && app.locator.isDenied {
+                Button {
+                    if let url = URL(string: "app-settings:") { openURL(url) }
+                } label: {
+                    SettingsRow(icon: "exclamationmark.triangle.fill", tint: Theme.danger,
+                                title: "Location access is off", subtitle: "Allow “While Using” in iOS Settings.") {
+                        Image(systemName: "arrow.up.right").font(.footnote.weight(.semibold)).foregroundStyle(Theme.inkTertiary)
                     }
                 }
+                .buttonStyle(.plain)
             }
-            .cruxFeedback(.selection, trigger: appearance)
-
-            SettingsCard {
-                SettingsRow(icon: "hand.tap.fill", title: "Haptics", subtitle: "Taps for logs, a pattern for projects") {
-                    Toggle("Haptics", isOn: $hapticsEnabled).labelsHidden()
-                }
+            SettingsRow(icon: "hand.tap", title: "Haptics", subtitle: "A tap for every log") {
+                Toggle("Haptics", isOn: $hapticsEnabled)
+                    .labelsHidden()
+                    .tint(Theme.accent)
             }
         }
-        .settingsSection("Look & feel")
+        .settingsSection("Sessions")
+        .animation(Theme.spring, value: autoSwitchGym)
     }
 
     // MARK: Grades
@@ -200,9 +200,9 @@ struct SettingsView: View {
         HStack(alignment: .top, spacing: 0) {
             ForEach(HexGrade.allCases) { grade in
                 VStack(spacing: 6) {
-                    HexBadge(grade: grade, color: .black, size: 34)
+                    HexBadge(grade: grade, color: .black, size: 38)
                     Text(grade.vRange)
-                        .font(.system(size: 10, weight: .medium))
+                        .font(.system(size: 10, weight: .semibold))
                         .foregroundStyle(Theme.inkSecondary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
@@ -212,86 +212,10 @@ struct SettingsView: View {
             }
         }
         .padding(.vertical, 16)
-        .padding(.horizontal, 8)
-        .glassEffect(.regular, in: .rect(cornerRadius: Theme.Radius.card))
-        .settingsSection("Hex grades", footer: "\(HiveHex.shared.name). V ranges are Hive's published approximations.")
-    }
-
-    // MARK: About
-
-    private var about: some View {
-        VStack(spacing: 8) {
-            Hexagon()
-                .stroke(Theme.accent, lineWidth: 3)
-                .frame(width: 30, height: 30)
-                .shadow(color: Theme.accent.opacity(0.6), radius: 8)
-            Text("CRUX.")
-                .font(.headline)
-                .foregroundStyle(Theme.ink)
-            Text("Version \(Bundle.main.versionString)")
-                .font(.caption)
-                .foregroundStyle(Theme.inkTertiary)
-            Text("Everything stays on this iPhone.\nHex grade ranges courtesy of Hive Climbing.")
-                .font(.caption)
-                .foregroundStyle(Theme.inkTertiary)
-                .multilineTextAlignment(.center)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.top, 8)
-    }
-}
-
-/// Appearance choice shown as a tiny preview of the theme.
-private struct AppearanceTile: View {
-    let option: Appearance
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 8) {
-                preview
-                    .frame(height: 54)
-                    .clipShape(.rect(cornerRadius: 12))
-                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.hairline, lineWidth: 1))
-                Text(option.label)
-                    .font(.subheadline.weight(isSelected ? .semibold : .regular))
-                    .foregroundStyle(isSelected ? Theme.accent : Theme.inkSecondary)
-            }
-            .padding(10)
-            .frame(maxWidth: .infinity)
-            .glassEffect(isSelected ? .regular.tint(Theme.accent.opacity(0.16)).interactive() : .regular.interactive(),
-                         in: .rect(cornerRadius: 20))
-            .overlay(RoundedRectangle(cornerRadius: 20).stroke(isSelected ? Theme.accent.opacity(0.6) : .clear, lineWidth: 1.5))
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("\(option.label) appearance")
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
-    }
-
-    @ViewBuilder
-    private var preview: some View {
-        switch option {
-        case .dark: swatch(background: Color(hex: 0x121315), bar: Color(hex: 0x2A2B30))
-        case .light: swatch(background: Color(hex: 0xF3F2EF), bar: Color(hex: 0xDEDCD7))
-        case .system:
-            HStack(spacing: 0) {
-                swatch(background: Color(hex: 0xF3F2EF), bar: Color(hex: 0xDEDCD7))
-                swatch(background: Color(hex: 0x121315), bar: Color(hex: 0x2A2B30))
-            }
-        }
-    }
-
-    private func swatch(background: Color, bar: Color) -> some View {
-        ZStack(alignment: .topLeading) {
-            background
-            VStack(alignment: .leading, spacing: 5) {
-                Hexagon().fill(Color(hex: 0xF2B45A)).frame(width: 12, height: 12)
-                Capsule().fill(bar).frame(width: 34, height: 5)
-                Capsule().fill(bar).frame(width: 22, height: 5)
-            }
-            .padding(8)
-        }
+        .padding(.horizontal, 6)
+        .background(RoundedRectangle(cornerRadius: Theme.Radius.row, style: .continuous).fill(Theme.cardFill))
+        .overlay(RoundedRectangle(cornerRadius: Theme.Radius.row, style: .continuous).strokeBorder(Theme.cardBorder, lineWidth: 1))
+        .settingsSection("Hex grades")
     }
 }
 

@@ -44,7 +44,9 @@ struct WallsView: View {
             .logToast()
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { GymSwitcher() }
+                    .sharedBackgroundVisibility(.hidden)
                 ToolbarItem(placement: .topBarTrailing) { SettingsToolbarButton() }
+                    .sharedBackgroundVisibility(.hidden)
             }
             .navigationDestination(for: Wall.self) { WallDetailView(wall: $0) }
             .navigationDestination(item: $opened) { ClimbDetailView(climb: $0) }
