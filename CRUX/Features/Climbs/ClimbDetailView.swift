@@ -10,167 +10,226 @@ struct ClimbDetailView: View {
     @Environment(SessionManager.self) private var sessions
     @State private var editing = false
     @State private var confirmingDelete = false
+    @State private var expandedSession: UUID?
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Theme.Spacing.section) {
-                hero
-                if !climb.isActive {
-                    strippedNotice
-                } else if sessions.activeSession != nil {
+                header
+                stats
+                if climb.isActive {
                     LogButtons(climb: climb)
                 } else {
-                    startPrompt
+                    strippedNotice
                 }
-                stats
-                BetaSection(climb: climb)
                 history
+                BetaSection(climb: climb)
             }
             .padding(.horizontal, Theme.Spacing.gutter)
-            .padding(.bottom, 24)
+            .padding(.bottom, 32)
         }
-        .nightGymBackground()
-        .navigationTitle(climb.displayName)
+        .nightGymBackground(tint: climb.holdColor.glow)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            if climb.isActive {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(climb.isProjectFlagged ? "Unstar project" : "Star as project",
-                       systemImage: climb.isProjectFlagged ? "star.fill" : "star") {
-                    withAnimation(Theme.spring) { climb.isProjectFlagged.toggle() }
-                    try? context.save()
-                }
-                .symbolEffect(.bounce, value: climb.isProjectFlagged)
-            }
-            }
             ToolbarItem(placement: .topBarTrailing) { moreMenu }
+            if climb.isActive {
+                ToolbarItem(placement: .topBarTrailing) { starToggle }
+                    .sharedBackgroundVisibility(.hidden)
+            }
         }
         .logToast()
         .sheet(isPresented: $editing) { ClimbEditorSheet(mode: .edit(climb)) }
         .alert("Delete this climb?", isPresented: $confirmingDelete) {
-            Button("Delete climb and its history", role: .destructive) { delete() }
             Button("Cancel", role: .cancel) {}
+            Button("Delete climb and its history", role: .destructive) { delete() }
         } message: {
             Text("All \(climb.tryCount) logs and any beta media will be removed. To keep history, strip it instead.")
         }
         .cruxFeedback(.selection, trigger: climb.isProjectFlagged)
     }
 
-    // MARK: Sections
+    // MARK: Header
 
-    private var hero: some View {
-        HStack(alignment: .center, spacing: 18) {
+    private var header: some View {
+        VStack(spacing: 10) {
             HexBadge(
                 grade: climb.grade,
                 color: climb.holdColor,
-                size: 84,
-                glowing: climb.isActive && climb.status.isTopped,
-                bloom: logger.bloom[climb.id] ?? 0
+                size: 116,
+                glowing: true,
+                bloom: logger.bloom[climb.id] ?? 0,
+                dim: !climb.isActive
             )
-            .saturation(climb.isActive ? 1 : 0)
-            .opacity(climb.isActive ? 1 : 0.6)
-            VStack(alignment: .leading, spacing: 6) {
-                Text(climb.grade.fullLabel)
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(Theme.ink)
-                Text([climb.holdColor.name, climb.wall?.name].compactMap(\.self).joined(separator: " · "))
-                    .font(.subheadline)
-                    .foregroundStyle(Theme.inkSecondary)
-                StatusLabel(status: climb.status)
-                if !climb.styleTags.isEmpty {
-                    FlowLayout(spacing: 6) {
-                        ForEach(climb.styleTags.sorted { $0.rawValue < $1.rawValue }) { TagPill(text: $0.name) }
-                    }
-                    .padding(.top, 2)
-                }
-            }
-            Spacer(minLength: 0)
+            .padding(.bottom, 8)
+            Text(climb.displayName)
+                .font(.system(size: 28, weight: .bold))
+                .foregroundStyle(Theme.ink)
+                .multilineTextAlignment(.center)
+            Text(subtitle)
+                .font(.system(size: 15))
+                .foregroundStyle(Theme.inkSecondary)
+                .multilineTextAlignment(.center)
         }
+        .frame(maxWidth: .infinity)
         .padding(.top, 8)
-        .animation(Theme.spring, value: climb.status)
     }
 
-    /// Logging lives in sessions; outside one, offer to start it right here.
-    private var startPrompt: some View {
+    private var subtitle: String {
+        let wall = climb.wall?.name
+        let tags = climb.styleTags.sorted { $0.rawValue < $1.rawValue }.map(\.name)
+            .filter { $0.caseInsensitiveCompare(wall ?? "") != .orderedSame }
+        return ([climb.grade.vRange, wall] + tags).compactMap(\.self).joined(separator: " · ")
+    }
+
+    private var starToggle: some View {
         Button {
-            logger.openSession()
-            sessions.queue(climb)
+            withAnimation(Theme.spring) { climb.isProjectFlagged.toggle() }
+            try? context.save()
         } label: {
-            Label("Start a session with this climb", systemImage: "plus")
-                .font(.body.weight(.semibold))
-                .frame(maxWidth: .infinity, minHeight: 30)
+            Label(climb.isProjectFlagged ? "Starred" : "Star", systemImage: climb.isProjectFlagged ? "star.fill" : "star")
+                .labelStyle(.titleAndIcon)
+                .symbolEffect(.bounce, value: climb.isProjectFlagged)
         }
-        .buttonStyle(.glassProminent)
-        .controlSize(.large)
+        .buttonStyle(PillButtonStyle(filled: climb.isProjectFlagged))
+        .accessibilityLabel(climb.isProjectFlagged ? "Unstar project" : "Star as project")
+    }
+
+    // MARK: Stats
+
+    private var stats: some View {
+        let sessionsCount = Set((climb.attempts ?? []).compactMap { $0.session?.id }).count
+        return HStack(spacing: 0) {
+            stat(Text("\(climb.tryCount)"), label: climb.tryCount == 1 ? "try" : "tries")
+            divider
+            stat(Text("\(sessionsCount)"), label: sessionsCount == 1 ? "session" : "sessions")
+            divider
+            VStack(spacing: 4) {
+                if climb.isActive {
+                    Label(climb.status.name, systemImage: climb.status.symbol)
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(StatusLabel.color(for: climb.status))
+                } else {
+                    Label("Stripped", systemImage: "archivebox.fill")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(Theme.danger)
+                }
+                Text("status")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.inkSecondary)
+            }
+            .frame(maxWidth: .infinity)
+            .accessibilityElement(children: .combine)
+        }
+    }
+
+    private var divider: some View {
+        Rectangle().fill(Theme.hairline).frame(width: 1, height: 36)
+    }
+
+    private func stat(_ value: Text, label: String) -> some View {
+        VStack(spacing: 4) {
+            value
+                .font(.number(size: 22))
+                .foregroundStyle(Theme.ink)
+                .contentTransition(.numericText())
+            Text(label)
+                .font(.system(size: 12))
+                .foregroundStyle(Theme.inkSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
     }
 
     private var strippedNotice: some View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "archivebox.fill")
                 .font(.title3)
-                .foregroundStyle(Theme.stripped)
+                .foregroundStyle(Theme.danger)
             VStack(alignment: .leading, spacing: 3) {
                 Text("Stripped \(climb.strippedAt?.formatted(date: .abbreviated, time: .omitted) ?? "")")
-                    .font(.headline)
-                    .foregroundStyle(Theme.stripped)
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(Theme.danger)
                 Text("This problem is no longer on the wall. Its logs and beta are kept. If it's back up, use ⋯ → Restore to wall.")
-                    .font(.subheadline)
+                    .font(.system(size: 14))
                     .foregroundStyle(Theme.inkSecondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .glassCard(padding: 16, tint: Theme.stripped.opacity(0.6))
+        .glassCard(padding: 16, tint: Theme.danger)
     }
 
-    private var stats: some View {
-        let sessionsCount = Set((climb.attempts ?? []).compactMap { $0.session?.id }).count
-        return Grid(horizontalSpacing: 10, verticalSpacing: 10) {
-            GridRow {
-                StatTile(value: "\(climb.tryCount)", caption: "total tries")
-                StatTile(value: "\(sessionsCount)", caption: sessionsCount == 1 ? "session" : "sessions")
-            }
-            GridRow {
-                StatTile(value: climb.triesToFirstSend.map { "\($0)" } ?? "—", caption: "tries to send")
-                StatTile(
-                    value: climb.firstSend?.timestamp.formatted(.dateTime.month(.abbreviated).day()) ?? "—",
-                    caption: climb.firstSend?.sendType == .flash ? "flashed" : "first send"
-                )
-            }
-        }
-    }
+    // MARK: History
 
     private var history: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.stack) {
-            SectionHeader(title: "History", trailing: climb.tryCount > 0 ? "\(climb.tryCount) logs" : nil)
-            if climb.tryCount == 0 {
-                Text("No logs yet.")
-                    .font(.subheadline)
+            SectionHeader(title: "History")
+            if bySession.isEmpty {
+                Text("No tries yet.")
+                    .font(.system(size: 15))
                     .foregroundStyle(Theme.inkTertiary)
-                    .glassCard(padding: 14)
+                    .glassCard(padding: 16)
             } else {
                 VStack(spacing: 0) {
-                    ForEach(Array(grouped.enumerated()), id: \.offset) { index, group in
-                        if index > 0 { Divider().overlay(Theme.hairline).padding(.vertical, 6) }
-                        Text(group.day.formatted(date: .complete, time: .omitted))
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(Theme.inkTertiary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.bottom, 4)
-                        ForEach(group.attempts) { attempt in
-                            AttemptRow(attempt: attempt)
-                        }
+                    ForEach(Array(bySession.enumerated()), id: \.offset) { index, group in
+                        if index > 0 { Rectangle().fill(Theme.hairline).frame(height: 1) }
+                        historyRow(group)
                     }
                 }
-                .glassCard()
+                .background(RoundedRectangle(cornerRadius: Theme.Radius.row, style: .continuous).fill(Theme.cardFill))
+                .overlay(RoundedRectangle(cornerRadius: Theme.Radius.row, style: .continuous).strokeBorder(Theme.cardBorder, lineWidth: 1))
             }
         }
     }
 
-    private var grouped: [(day: Date, attempts: [Attempt])] {
-        let calendar = Calendar.current
-        let groups = Dictionary(grouping: climb.chronologicalAttempts.reversed()) { calendar.startOfDay(for: $0.timestamp) }
-        return groups.keys.sorted(by: >).map { ($0, groups[$0] ?? []) }
+    private func historyRow(_ group: (session: ClimbSession?, attempts: [Attempt])) -> some View {
+        let id = group.session?.id
+        let expanded = id != nil && expandedSession == id
+        return VStack(spacing: 0) {
+            Button {
+                withAnimation(Theme.spring) { expandedSession = expanded ? nil : id }
+            } label: {
+                HStack {
+                    Text(label(for: group.session, fallback: group.attempts.first?.timestamp))
+                        .font(.system(size: 16))
+                        .foregroundStyle(Theme.ink)
+                    Spacer()
+                    TryTrail(attempts: group.attempts, dot: 8)
+                }
+                .padding(.horizontal, 16)
+                .frame(minHeight: 48)
+                .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint("Shows each try")
+
+            if expanded {
+                VStack(spacing: 0) {
+                    ForEach(group.attempts.reversed()) { attempt in
+                        AttemptRow(attempt: attempt)
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 8)
+                .transition(.opacity)
+            }
+        }
     }
+
+    private func label(for session: ClimbSession?, fallback: Date?) -> String {
+        if let session, session.id == sessions.activeSession?.id { return "This session" }
+        guard let date = session?.startedAt ?? fallback else { return "—" }
+        return Format.relativeDay(date)
+    }
+
+    /// One row per session, newest first, each with that session's tries in order.
+    private var bySession: [(session: ClimbSession?, attempts: [Attempt])] {
+        let groups = Dictionary(grouping: climb.chronologicalAttempts) { $0.session?.id }
+        return groups.values
+            .map { attempts in (attempts.first?.session, attempts) }
+            .sorted { ($0.1.first?.timestamp ?? .distantPast) > ($1.1.first?.timestamp ?? .distantPast) }
+    }
+
+    // MARK: More
 
     private var moreMenu: some View {
         Menu {
