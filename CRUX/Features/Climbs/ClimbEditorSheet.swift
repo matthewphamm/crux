@@ -14,7 +14,7 @@ struct ClimbEditorSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
     @Environment(AppModel.self) private var app
-    @Environment(LogCoordinator.self) private var logger
+    @Environment(SessionManager.self) private var sessions
     @AppStorage("editor.lastWallID") private var lastWallID = ""
 
     @State private var grade: HexGrade = .three
@@ -28,24 +28,34 @@ struct ClimbEditorSheet: View {
     @State private var newWallName = ""
     @State private var showingNewWall = false
     @State private var loaded = false
+    @State private var showingMore = false
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: Theme.Spacing.section) {
                     hero
-                    gradePicker
                     colorPicker
+                    gradePicker
                     wallPicker
-                    tagPicker
-                    details
-                    if isCreating { betaPicker }
+                    if isCreating {
+                        moreToggle
+                        if showingMore {
+                            tagPicker
+                            details
+                            betaPicker
+                        }
+                    } else {
+                        tagPicker
+                        details
+                    }
                 }
                 .padding(.horizontal, Theme.Spacing.gutter)
                 .padding(.bottom, 24)
             }
             .scrollDismissesKeyboard(.interactively)
-            .nightGymBackground()
+            .background(Theme.sheet)
+            .scrollContentBackground(.hidden)
             .navigationTitle(isCreating ? "New climb" : "Edit climb")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -54,8 +64,8 @@ struct ClimbEditorSheet: View {
                 }
                 if !isCreating {
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("Save", systemImage: "checkmark") { save(log: nil) }
-                            .buttonStyle(.glassProminent)
+                        Button("Save") { save() }
+                            .buttonStyle(PillButtonStyle(filled: true))
                     }
                 }
             }
@@ -71,6 +81,9 @@ struct ClimbEditorSheet: View {
             .cruxFeedback(.selection, trigger: color)
             .onAppear(perform: load)
         }
+        .presentationBackground(Theme.sheet)
+        .presentationCornerRadius(Theme.Radius.sheet)
+        .presentationDragIndicator(.visible)
     }
 
     private var isCreating: Bool {
@@ -89,7 +102,7 @@ struct ClimbEditorSheet: View {
                 .animation(Theme.spring, value: color)
             VStack(alignment: .leading, spacing: 4) {
                 Text(name.isEmpty ? "\(color.name) \(grade.label)" : name)
-                    .font(.title3.weight(.semibold))
+                    .font(.system(size: 22, weight: .bold))
                     .foregroundStyle(Theme.ink)
                     .contentTransition(.interpolate)
                 Text("≈ \(grade.vRange)")
@@ -104,16 +117,23 @@ struct ClimbEditorSheet: View {
 
     private var gradePicker: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.stack) {
-            SectionHeader(title: "Grade", trailing: grade.vRange)
-            HStack(spacing: 4) {
+            SectionHeader(title: "Grade")
+            HStack(spacing: 0) {
                 ForEach(HexGrade.allCases) { option in
                     Button {
                         withAnimation(Theme.spring) { grade = option }
                     } label: {
-                        HexBadge(grade: option, color: option == grade ? color : .black, size: 42, glowing: option == grade)
-                            .scaleEffect(option == grade ? 1.1 : 0.94)
-                            .opacity(option == grade ? 1 : 0.6)
-                            .frame(maxWidth: .infinity)
+                        VStack(spacing: 5) {
+                            HexBadge(grade: option, color: option == grade ? color : .black, size: 40, glowing: option == grade)
+                                .scaleEffect(option == grade ? 1.08 : 1)
+                                .opacity(option == grade ? 1 : 0.55)
+                            Text(option.vRange)
+                                .font(.system(size: 9, weight: .semibold))
+                                .foregroundStyle(option == grade ? Theme.accent : Theme.inkTertiary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.8)
+                        }
+                        .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(option.fullLabel)
@@ -125,7 +145,7 @@ struct ClimbEditorSheet: View {
 
     private var colorPicker: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.stack) {
-            SectionHeader(title: "Hold color", trailing: color.name)
+            SectionHeader(title: "Hold colour", trailing: color.name)
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: 5), spacing: 12) {
                 ForEach(HoldColor.allCases) { option in
                     Button {
@@ -135,7 +155,7 @@ struct ClimbEditorSheet: View {
                             .fill(option.color)
                             .overlay(Circle().stroke(.white.opacity(0.15), lineWidth: 1))
                             .padding(5)
-                            .overlay(Circle().stroke(option == color ? Theme.ink : .clear, lineWidth: 2))
+                            .overlay(Circle().stroke(option == color ? Theme.accent : .clear, lineWidth: 2))
                             .shadow(color: option.glow.opacity(option == color ? 0.5 : 0), radius: 8)
                             .frame(height: 50)
                     }
@@ -224,25 +244,32 @@ struct ClimbEditorSheet: View {
         }
     }
 
-    private var createActions: some View {
-        GlassEffectContainer(spacing: 12) {
-            HStack(spacing: 12) {
-                Button {
-                    save(log: nil)
-                } label: {
-                    Text("Save").font(.body.weight(.semibold)).frame(maxWidth: .infinity, minHeight: 32)
-                }
-                .buttonStyle(.glass)
-
-                Button {
-                    save(log: .attempt)
-                } label: {
-                    Text("Save & log").font(.body.weight(.semibold)).frame(maxWidth: .infinity, minHeight: 32)
-                }
-                .buttonStyle(.glassProminent)
+    private var moreToggle: some View {
+        Button {
+            withAnimation(Theme.spring) { showingMore.toggle() }
+        } label: {
+            HStack {
+                Text("Name, style, notes and beta")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(Theme.inkSecondary)
+                Spacer()
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Theme.inkTertiary)
+                    .rotationEffect(.degrees(showingMore ? 180 : 0))
             }
-            .controlSize(.large)
+            .glassCard(padding: 14)
         }
+        .buttonStyle(.plain)
+    }
+
+    private var createActions: some View {
+        Button {
+            save()
+        } label: {
+            Label("Add to session", systemImage: "plus")
+        }
+        .buttonStyle(AccentButtonStyle())
         .padding(.horizontal, Theme.Spacing.gutter)
         .padding(.bottom, 8)
     }
@@ -274,7 +301,7 @@ struct ClimbEditorSheet: View {
         withAnimation(Theme.spring) { wallID = wall.id }
     }
 
-    private func save(log outcome: AttemptOutcome?) {
+    private func save() {
         let climb: Climb
         switch mode {
         case .create:
@@ -297,8 +324,8 @@ struct ClimbEditorSheet: View {
         if !items.isEmpty {
             Task { await BetaImporter.importItems(items, into: climb, context: context) }
         }
-        if let outcome {
-            logger.log(outcome, on: climb)
+        if isCreating, sessions.activeSession != nil {
+            withAnimation(Theme.spring) { sessions.queue(climb) }
         }
         dismiss()
     }

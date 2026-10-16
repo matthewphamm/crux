@@ -16,7 +16,7 @@ struct LiveSessionView: View {
     @State private var confirmingEnd = false
     @State private var ended: ClimbSession?
     @State private var endingByUser = false
-    @Namespace private var namespace
+    @State private var opened: Climb?
 
     var body: some View {
         if let ended {
@@ -30,20 +30,33 @@ struct LiveSessionView: View {
     private var live: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: Theme.Spacing.section) {
-                    SessionHeader(session: sessions.activeSession) { confirmingEnd = true }
+                VStack(alignment: .leading, spacing: 14) {
+                    statsStrip
 
                     if climbs.isEmpty {
                         emptyState
                     } else {
-                        VStack(alignment: .leading, spacing: Theme.Spacing.stack) {
-                            SectionHeader(title: "This session", trailing: "\(climbs.count)")
+                        HStack {
+                            Text("← add a try")
+                            Spacer()
+                            Text("Tap to open")
+                            Spacer()
+                            Text("send →")
+                        }
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.inkTertiary)
+                        .padding(.horizontal, 4)
+                        .accessibilityHidden(true)
+
+                        VStack(spacing: 8) {
                             ForEach(climbs) { climb in
-                                ClimbLogCard(climb: climb, session: sessions.activeSession, namespace: namespace)
-                                    .transition(.asymmetric(
-                                        insertion: .scale(scale: 0.96).combined(with: .opacity),
-                                        removal: .opacity
-                                    ))
+                                SwipeLogRow(climb: climb, session: sessions.activeSession) {
+                                    opened = climb
+                                }
+                                .transition(.asymmetric(
+                                    insertion: .move(edge: .top).combined(with: .opacity),
+                                    removal: .opacity
+                                ))
                             }
                         }
                         .animation(Theme.spring, value: climbs.map(\.id))
@@ -61,13 +74,15 @@ struct LiveSessionView: View {
                     Button("Minimize", systemImage: "chevron.down") { dismiss() }
                         .accessibilityHint("Keeps the session running")
                 }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("End") { confirmingEnd = true }
+                        .buttonStyle(PillButtonStyle())
+                }
+                .sharedBackgroundVisibility(.hidden)
             }
             .logToast()
             .safeAreaInset(edge: .bottom, spacing: 0) { addBar }
-            .navigationDestination(for: Climb.self) { climb in
-                ClimbDetailView(climb: climb)
-                    .navigationTransition(.zoom(sourceID: climb.id, in: namespace))
-            }
+            .navigationDestination(item: $opened) { ClimbDetailView(climb: $0) }
             .sheet(isPresented: $showingPicker) {
                 ClimbPickerSheet(climbs: gymClimbs, excluding: Set(climbs.map(\.id))) { climb in
                     withAnimation(Theme.spring) { sessions.queue(climb) }
@@ -77,8 +92,8 @@ struct LiveSessionView: View {
                 ClimbEditorSheet(mode: .create)
             }
             .alert("End this session?", isPresented: $confirmingEnd) {
-                Button("End session") { end() }
                 Button("Keep climbing", role: .cancel) {}
+                Button("End session") { end() }
             } message: {
                 Text(endMessage)
             }
@@ -89,35 +104,68 @@ struct LiveSessionView: View {
         }
     }
 
-    private var addBar: some View {
-        GlassEffectContainer(spacing: 12) {
-            HStack(spacing: 12) {
-                Button {
-                    showingPicker = true
-                } label: {
-                    Label("From the wall", systemImage: "square.stack.3d.up")
-                        .font(.body.weight(.semibold))
-                        .frame(maxWidth: .infinity, minHeight: 32)
+    /// Elapsed (amber), tries, sends (green), flashes.
+    private var statsStrip: some View {
+        let attempts = sessions.activeSession?.attempts ?? []
+        let sends = attempts.filter(\.isSend)
+        return HStack(spacing: 0) {
+            VStack(spacing: 2) {
+                if let session = sessions.activeSession {
+                    TimelineView(.periodic(from: session.startedAt, by: 1)) { context in
+                        Text(Format.clock(context.date.timeIntervalSince(session.startedAt)))
+                            .font(.number(size: 22))
+                            .foregroundStyle(Theme.accent)
+                    }
+                } else {
+                    Text("0:00").font(.number(size: 22)).foregroundStyle(Theme.accent)
                 }
-                .buttonStyle(.glass)
-                .disabled(gymClimbs.isEmpty)
-
-                Button {
-                    showingNewClimb = true
-                } label: {
-                    Label("New climb", systemImage: "plus")
-                        .font(.body.weight(.semibold))
-                        .frame(maxWidth: .infinity, minHeight: 32)
-                }
-                .buttonStyle(.glassProminent)
+                Text("elapsed").font(.system(size: 11)).foregroundStyle(Theme.inkSecondary)
             }
-            .controlSize(.large)
+            .frame(maxWidth: .infinity)
+            stripStat("\(attempts.count)", "tries")
+            stripStat("\(sends.count)", "sends", tint: Theme.send)
+            stripStat("\(sends.filter { $0.sendType == .flash }.count)", "flashes")
+        }
+        .padding(.vertical, 14)
+        .frame(maxWidth: .infinity)
+        .background(RoundedRectangle(cornerRadius: Theme.Radius.row, style: .continuous).fill(Theme.cardFill))
+        .overlay(RoundedRectangle(cornerRadius: Theme.Radius.row, style: .continuous).strokeBorder(Theme.cardBorder, lineWidth: 1))
+    }
+
+    private func stripStat(_ value: String, _ label: String, tint: Color = Theme.ink) -> some View {
+        VStack(spacing: 2) {
+            Text(value)
+                .font(.number(size: 22))
+                .foregroundStyle(tint)
+                .contentTransition(.numericText())
+            Text(label).font(.system(size: 11)).foregroundStyle(Theme.inkSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var addBar: some View {
+        HStack(spacing: 12) {
+            Button {
+                showingPicker = true
+            } label: {
+                Label("From the wall", systemImage: "square.3.layers.3d")
+            }
+            .buttonStyle(ControlButtonStyle(ink: Theme.accent))
+            .disabled(gymClimbs.isEmpty)
+
+            Button {
+                showingNewClimb = true
+            } label: {
+                Label("New climb", systemImage: "plus")
+            }
+            .buttonStyle(AccentButtonStyle())
         }
         .padding(.horizontal, Theme.Spacing.gutter)
         .padding(.top, 20)
         .padding(.bottom, 8)
         .background(alignment: .bottom) {
-            LinearGradient(colors: [Theme.background.opacity(0), Theme.background.opacity(0.9)], startPoint: .top, endPoint: .bottom)
+            LinearGradient(colors: [Theme.background.opacity(0), Theme.background.opacity(0.92)], startPoint: .top, endPoint: .bottom)
                 .ignoresSafeArea()
                 .allowsHitTesting(false)
         }
@@ -127,15 +175,16 @@ struct LiveSessionView: View {
         VStack(spacing: 14) {
             HexBadge(grade: .three, color: .orange, size: 60, glowing: true)
             Text("What are you trying first?")
-                .font(.title3.weight(.semibold))
+                .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(Theme.ink)
             Text("Pick a problem that's already on the wall, or add a new one. Every attempt and send lands in this session.")
-                .font(.subheadline)
+                .font(.system(size: 15))
                 .foregroundStyle(Theme.inkSecondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 36)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 60)
     }
 
     private var endMessage: String {
@@ -152,6 +201,7 @@ struct LiveSessionView: View {
             if let summary {
                 ended = summary
             } else {
+                logger.show(Toast(message: "Nothing logged, so it wasn't saved", symbol: "xmark", tint: Theme.inkSecondary))
                 dismiss()
             }
         }
@@ -161,14 +211,18 @@ struct LiveSessionView: View {
 
     private var gymClimbs: [Climb] { activeClimbs.inGym(app.currentGym) }
 
-    /// Most recently logged first, then climbs added but not yet tried.
+    /// Newest additions on top. Logging never reorders rows, so nothing jumps under your thumb.
     private var climbs: [Climb] {
         guard let session = sessions.activeSession else { return [] }
-        let logged = (session.attempts ?? [])
-            .sorted { $0.timestamp > $1.timestamp }
-            .compactMap(\.climb)
         let queued = sessions.queuedClimbIDs.compactMap { id in gymClimbs.first { $0.id == id } }
         let added = gymClimbs.filter { $0.createdAt >= session.startedAt }
+        var firstLog: [UUID: Date] = [:]
+        for attempt in session.attempts ?? [] {
+            guard let id = attempt.climb?.id else { continue }
+            firstLog[id] = min(firstLog[id] ?? attempt.timestamp, attempt.timestamp)
+        }
+        let logged = (session.attempts ?? []).compactMap(\.climb).uniqued()
+            .sorted { (firstLog[$0.id] ?? .distantPast) > (firstLog[$1.id] ?? .distantPast) }
         return (queued + added + logged).uniqued().filter(\.isActive)
     }
 }

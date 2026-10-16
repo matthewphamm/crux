@@ -9,7 +9,8 @@ final class LogCoordinator {
     private let sessions: SessionManager
 
     private(set) var toast: Toast?
-    private var lastResult: LogResult?
+    /// Reverts exactly what the current toast describes.
+    private var undoAction: (() -> Void)?
 
     // Feedback triggers, observed by `.logFeedback()` at the root.
     private(set) var attemptTick = 0
@@ -41,44 +42,49 @@ final class LogCoordinator {
         let result = withAnimation(Theme.spring) {
             sessions.log(outcome, on: climb, sendType: sendType)
         }
-        lastResult = result
+        let undo = { [sessions] in sessions.undo(result) }
 
         switch (outcome, result.sendType) {
         case (.attempt, _):
             attemptTick += 1
-            show(Toast(message: "Attempt · \(climb.displayName)", symbol: "plus"))
+            let tries = result.attempt.session.map { climb.tries(in: $0) } ?? climb.tryCount
+            show(Toast(message: "\(climb.displayName) · try \(tries) logged", symbol: "plus", tint: Theme.accent), undo: undo)
         case (.send, _) where result.completedProject:
             HapticsService.shared.playProjectSend()
             bloom[climb.id, default: 0] += 1
-            show(Toast(message: "Project sent — \(climb.displayName)", symbol: "sparkles", tint: Theme.accent))
+            show(Toast(message: "Project sent! \(climb.displayName)", symbol: "sparkles", tint: Theme.accent), undo: undo)
         case (.send, .flash):
             flashTick += 1
             bloom[climb.id, default: 0] += 1
-            show(Toast(message: "Flashed \(climb.displayName)", symbol: "bolt.fill", tint: Theme.accent))
+            show(Toast(message: "Flashed! \(climb.displayName)", symbol: "bolt.fill", tint: Theme.accent), undo: undo)
         case (.send, let type):
             sendTick += 1
             let verb = type == .repeat ? "Repeated" : "Sent"
-            show(Toast(message: "\(verb) \(climb.displayName)", symbol: "checkmark", tint: Theme.send))
+            show(Toast(message: "\(verb) \(climb.displayName)", symbol: "checkmark", tint: Theme.send), undo: undo)
         }
     }
 
     func undo() {
-        guard let lastResult else { return }
+        guard let undoAction else { return }
         withAnimation(Theme.spring) {
-            sessions.undo(lastResult)
+            undoAction()
             toast = nil
         }
-        self.lastResult = nil
+        self.undoAction = nil
         undoTick += 1
     }
 
     func dismissToast(_ id: UUID) {
         guard toast?.id == id else { return }
         withAnimation(.smooth) { toast = nil }
-        lastResult = nil
+        undoAction = nil
     }
 
-    func show(_ toast: Toast) {
+    /// Shows a toast. With `undo`, the toast offers Undo that runs it.
+    func show(_ toast: Toast, undo: (() -> Void)? = nil) {
+        var toast = toast
+        toast.undo = undo != nil
+        undoAction = undo
         withAnimation(Theme.spring) { self.toast = toast }
     }
 }

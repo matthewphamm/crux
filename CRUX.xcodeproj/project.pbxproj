@@ -12,6 +12,7 @@
 		0A8CFA00FF8B56601E8686A6 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 577DC4E1DB4E952AF42F0D2A /* Components.swift */; };
 		19CB69C024BAF68AD5B26F6E /* Wall.swift in Sources */ = {isa = PBXBuildFile; fileRef = B735B8860818CF16EFB438AA /* Wall.swift */; };
 		1ABA466130C51665FE2FEF97 /* CameraPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00F2B4B365CA5ECC5A075CF7 /* CameraPicker.swift */; };
+		1B5ED5DB40D448F21B2D8E96 /* SwipeLogRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 776003705DEF2B107F6B666F /* SwipeLogRow.swift */; };
 		1EE947A2000D0FCD9F78DC87 /* Climb.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBAAA1EAEF5CB6CEC86E079A /* Climb.swift */; };
 		227C7487ED49051723765459 /* SessionConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2457784825FB233CCBF630BD /* SessionConfig.swift */; };
 		2BCF91F276BEDB1BBD81120B /* BetaImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B82F70C30D3CF327625D47A /* BetaImporter.swift */; };
@@ -24,9 +25,7 @@
 		521AA38F991224B60A9E4684 /* LogCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 716F1E98F38CFAA9727B8737 /* LogCoordinator.swift */; };
 		5D6A03A89CB3267D55392DE7 /* WallDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F031B4A705AD684FAE4307E6 /* WallDetailView.swift */; };
 		5F2A7DF11530E8D0015C466E /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE912301ECF0369ED4931978 /* SessionManager.swift */; };
-		7001A536AB2882445E1C7B50 /* ClimbLogCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3520683A09BA3B5ACD85E718 /* ClimbLogCard.swift */; };
 		71FA810395FBCAAEAD54609D /* SettingsComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BB317AE677D93056D34AB66 /* SettingsComponents.swift */; };
-		7CB276B1F717F377256BED7E /* SessionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D09BECF69C09EEA1E8C2E3D /* SessionHeader.swift */; };
 		8054A74BA934038499C80423 /* StyleTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0A6E0A312AF772D1B64DADB /* StyleTag.swift */; };
 		813338465EFA5CFCCE47FECA /* SessionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E98FBD15ABC51A75532BA5 /* SessionManagerTests.swift */; };
 		87935366CECD63DE98776537 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD8C20473C46ED79D1EC2E23 /* AppModel.swift */; };
@@ -86,9 +85,7 @@
 		1BB317AE677D93056D34AB66 /* SettingsComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsComponents.swift; sourceTree = "<group>"; };
 		1BEE13054E7C74C6C06CCF84 /* GymTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymTests.swift; sourceTree = "<group>"; };
 		2457784825FB233CCBF630BD /* SessionConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionConfig.swift; sourceTree = "<group>"; };
-		2D09BECF69C09EEA1E8C2E3D /* SessionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionHeader.swift; sourceTree = "<group>"; };
 		34AF86879A246610EB3B890C /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
-		3520683A09BA3B5ACD85E718 /* ClimbLogCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbLogCard.swift; sourceTree = "<group>"; };
 		3B8BE3C36DD1E25CD4D2C829 /* Attempt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attempt.swift; sourceTree = "<group>"; };
 		3CE8D9B0EE6C38C260D8918F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		3E7D7E9C7360B45715ADF6B7 /* LiveSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveSessionView.swift; sourceTree = "<group>"; };
@@ -106,6 +103,7 @@
 		6E3B66BE77330CE5ED367F84 /* LogButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogButtons.swift; sourceTree = "<group>"; };
 		6E4B4ABF31988D7801FE6D97 /* SessionSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSummaryView.swift; sourceTree = "<group>"; };
 		716F1E98F38CFAA9727B8737 /* LogCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogCoordinator.swift; sourceTree = "<group>"; };
+		776003705DEF2B107F6B666F /* SwipeLogRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeLogRow.swift; sourceTree = "<group>"; };
 		793A63E30C341C980F22FA70 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		7EC47AED6BFE5A821CB901EC /* HoldColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoldColor.swift; sourceTree = "<group>"; };
 		7FA06B2F23E62038622BC4D1 /* GymSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymSwitcher.swift; sourceTree = "<group>"; };
@@ -268,10 +266,9 @@
 		B66DD6025C65DF3E6D478DAB /* Log */ = {
 			isa = PBXGroup;
 			children = (
-				3520683A09BA3B5ACD85E718 /* ClimbLogCard.swift */,
 				C98DA918590099E668E5BEA4 /* ClimbPickerSheet.swift */,
 				6E3B66BE77330CE5ED367F84 /* LogButtons.swift */,
-				2D09BECF69C09EEA1E8C2E3D /* SessionHeader.swift */,
+				776003705DEF2B107F6B666F /* SwipeLogRow.swift */,
 			);
 			path = Log;
 			sourceTree = "<group>";
@@ -485,7 +482,6 @@
 				BF7F2E1D88DF0D02E9E72F13 /* ClimbEditorSheet.swift in Sources */,
 				C15A621D5F45774F19C7E65D /* ClimbFilter.swift in Sources */,
 				A71C59BCF3D873C7E0334B2D /* ClimbFilterSheet.swift in Sources */,
-				7001A536AB2882445E1C7B50 /* ClimbLogCard.swift in Sources */,
 				97F260519DD104214009E162 /* ClimbPickerSheet.swift in Sources */,
 				E3F056D1AE880BC077EB3FF1 /* ClimbSession.swift in Sources */,
 				E20176F52936C11629DD5E61 /* ClimbsView.swift in Sources */,
@@ -510,7 +506,6 @@
 				D1CE6CF712567CBBB335940C /* RootTabView.swift in Sources */,
 				ECAA88D14330B37A0C72D7E1 /* SeedData.swift in Sources */,
 				227C7487ED49051723765459 /* SessionConfig.swift in Sources */,
-				7CB276B1F717F377256BED7E /* SessionHeader.swift in Sources */,
 				5F2A7DF11530E8D0015C466E /* SessionManager.swift in Sources */,
 				E769D358B392A4015138DDE0 /* SessionSummaryView.swift in Sources */,
 				454A95F58E35A6AE41B7B94F /* SessionsListView.swift in Sources */,
@@ -519,6 +514,7 @@
 				3472CFA8734009C8B9542D24 /* StatsService.swift in Sources */,
 				3577DD1A7FF7E3C549B5D29D /* StatsView.swift in Sources */,
 				8054A74BA934038499C80423 /* StyleTag.swift in Sources */,
+				1B5ED5DB40D448F21B2D8E96 /* SwipeLogRow.swift in Sources */,
 				BCE6C6E887135A4CEBBF569F /* Theme.swift in Sources */,
 				19CB69C024BAF68AD5B26F6E /* Wall.swift in Sources */,
 				5D6A03A89CB3267D55392DE7 /* WallDetailView.swift in Sources */,

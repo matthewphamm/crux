@@ -67,6 +67,8 @@ struct PillButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 15, weight: .semibold))
+            .lineLimit(1)
+            .fixedSize()
             .foregroundStyle(filled ? Theme.onAccent : tint)
             .padding(.horizontal, 14)
             .frame(minHeight: 36)
@@ -166,7 +168,9 @@ struct StatusLabel: View {
             .labelStyle(.titleAndIcon)
     }
 
-    private var color: Color {
+    private var color: Color { Self.color(for: status) }
+
+    static func color(for status: ClimbStatus) -> Color {
         switch status {
         case .untried: Theme.inkTertiary
         case .working: Theme.inkSecondary

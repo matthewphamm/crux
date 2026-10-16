@@ -44,8 +44,9 @@ struct ClimbPickerSheet: View {
                 .padding(.horizontal, Theme.Spacing.gutter)
                 .padding(.bottom, 20)
             }
-            .nightGymBackground()
-            .navigationTitle("Add from the wall")
+            .background(Theme.sheet)
+            .scrollContentBackground(.hidden)
+            .navigationTitle("From the wall")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Name, color, tag")
             .toolbar {
@@ -58,6 +59,8 @@ struct ClimbPickerSheet: View {
             .cruxFeedback(.impact(weight: .light), trigger: pickTick)
         }
         .presentationDetents([.large])
+        .presentationBackground(Theme.sheet)
+        .presentationCornerRadius(Theme.Radius.sheet)
     }
 
     private var walls: [Wall] {
@@ -123,10 +126,9 @@ struct ClimbPickerSheet: View {
                     .foregroundStyle(Theme.inkSecondary)
             }
             Spacer()
-            StatusLabel(status: climb.status)
-            Image(systemName: "plus.circle.fill")
-                .font(.title3)
-                .foregroundStyle(Theme.accent)
+            Text(climb.status.name)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(StatusLabel.color(for: climb.status))
         }
         .glassCard(padding: 12)
         .contentShape(.rect)
