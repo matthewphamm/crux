@@ -331,3 +331,43 @@ enum Format {
         }
     }
 }
+
+// MARK: - Segmented control
+
+/// Track `rgba(255,255,255,.06)` with a sliding `.14` selection; radius 18 (inner 15).
+struct CruxSegmented<Value: Hashable & Identifiable>: View {
+    let options: [Value]
+    @Binding var selection: Value
+    let title: (Value) -> String
+
+    @Namespace private var namespace
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(options) { option in
+                let selected = option == selection
+                Button {
+                    withAnimation(Theme.spring) { selection = option }
+                } label: {
+                    Text(title(option))
+                        .font(.system(size: 14, weight: selected ? .semibold : .medium))
+                        .foregroundStyle(selected ? Theme.ink : Theme.inkSecondary)
+                        .frame(maxWidth: .infinity, minHeight: 34)
+                        .background {
+                            if selected {
+                                RoundedRectangle(cornerRadius: 15, style: .continuous)
+                                    .fill(Theme.segmentSelected)
+                                    .matchedGeometryEffect(id: "segment", in: namespace)
+                            }
+                        }
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(selected ? .isSelected : [])
+            }
+        }
+        .padding(3)
+        .background(RoundedRectangle(cornerRadius: 18, style: .continuous).fill(Theme.segmentTrack))
+        .cruxFeedback(.selection, trigger: selection)
+    }
+}

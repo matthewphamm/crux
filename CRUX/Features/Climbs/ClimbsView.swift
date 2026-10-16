@@ -18,10 +18,9 @@ struct ClimbsView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
-                    Picker("Show", selection: $segment.animation(Theme.spring)) {
-                        ForEach(ClimbSegment.allCases) { Text($0.rawValue).tag($0) }
-                    }
-                    .pickerStyle(.segmented)
+                    searchRow
+
+                    CruxSegmented(options: ClimbSegment.allCases, selection: $segment) { $0.rawValue }
 
                     gradeStrip
 
@@ -29,7 +28,7 @@ struct ClimbsView: View {
 
                     if segment == .stripped && !results.isEmpty { strippedNote }
 
-                    LazyVStack(spacing: 10) {
+                    LazyVStack(spacing: 8) {
                         ForEach(results) { climb in
                             NavigationLink(value: climb) {
                                 ClimbRow(climb: climb)
@@ -50,14 +49,10 @@ struct ClimbsView: View {
             }
             .nightGymBackground()
             .navigationTitle("Climbs")
-            .searchable(text: $query, prompt: "Search climbs")
             .cruxTabBar()
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { GymSwitcher() }
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    filterButton
-                    SettingsToolbarButton()
-                }
+                ToolbarItem(placement: .topBarTrailing) { SettingsToolbarButton() }
             }
             .navigationDestination(for: Climb.self) { climb in
                 ClimbDetailView(climb: climb)
@@ -72,7 +67,10 @@ struct ClimbsView: View {
                 )
             }
             .cruxFeedback(.selection, trigger: filter.grades)
-            .cruxFeedback(.selection, trigger: segment)
+            .onChange(of: app.currentGym?.id) {
+                filter = ClimbFilter()
+                query = ""
+            }
         }
     }
 
@@ -84,20 +82,26 @@ struct ClimbsView: View {
 
     // MARK: Grade strip
 
-    /// Seven hex buttons — tap any to show just those grades.
+    /// Seven hex buttons with a count bar above each — tap any to show just those grades.
     private var gradeStrip: some View {
-        HStack(spacing: 0) {
+        let counts = gradeCounts
+        let peak = max(counts.values.max() ?? 0, 1)
+        return HStack(spacing: 0) {
             ForEach(HexGrade.allCases) { grade in
                 let isOn = filter.grades.contains(grade)
                 let dimmed = !filter.grades.isEmpty && !isOn
+                let count = counts[grade.rawValue] ?? 0
                 Button {
                     withAnimation(Theme.spring) { filter.grades.formSymmetricDifference([grade]) }
                 } label: {
-                    VStack(spacing: 4) {
-                        HexBadge(grade: grade, color: isOn ? .orange : .black, size: 36, glowing: isOn)
-                            .scaleEffect(isOn ? 1.06 : 1)
+                    VStack(spacing: 5) {
+                        Capsule()
+                            .fill(isOn ? Theme.accent : Theme.inkTertiary)
+                            .frame(width: 4, height: 2 + 20 * CGFloat(count) / CGFloat(peak))
+                            .frame(height: 22, alignment: .bottom)
+                        HexBadge(grade: grade, color: isOn ? .orange : .black, size: 38, glowing: isOn)
                         Text(grade.vRange)
-                            .font(.system(size: 9, weight: .medium))
+                            .font(.system(size: 9, weight: .semibold))
                             .foregroundStyle(isOn ? Theme.accent : Theme.inkTertiary)
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
@@ -107,34 +111,83 @@ struct ClimbsView: View {
                     .contentShape(.rect)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(grade.fullLabel)
+                .accessibilityLabel("\(grade.fullLabel), \(count) climbs")
                 .accessibilityAddTraits(isOn ? .isSelected : [])
             }
         }
-        .padding(.vertical, 4)
+    }
+
+    /// Climbs per grade in the current segment (before the grade filter).
+    private var gradeCounts: [Int: Int] {
+        var unfiltered = filter
+        unfiltered.grades = []
+        let pool = ClimbFilter.apply(gymClimbs, segment: segment, filter: unfiltered, sort: sort, query: query)
+        return Dictionary(grouping: pool, by: \.gradeValue).mapValues(\.count)
+    }
+
+    // MARK: Search
+
+    private var searchRow: some View {
+        HStack(spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 15))
+                    .foregroundStyle(Theme.inkTertiary)
+                TextField("Search climbs", text: $query)
+                    .font(.system(size: 16))
+                    .submitLabel(.search)
+                if !query.isEmpty {
+                    Button { query = "" } label: {
+                        Image(systemName: "xmark.circle.fill").foregroundStyle(Theme.inkTertiary)
+                    }
+                    .accessibilityLabel("Clear search")
+                }
+            }
+            .padding(.horizontal, 12)
+            .frame(height: 38)
+            .controlBackground(Capsule())
+
+            filterButton
+        }
     }
 
     // MARK: Filter button & summary
 
     private var filterButton: some View {
-        Button {
+        let count = filter.sheetFilterCount
+        return Button {
             showingFilters = true
         } label: {
-            Image(systemName: filter.sheetFilterCount > 0
-                  ? "line.3.horizontal.decrease.circle.fill"
-                  : "line.3.horizontal.decrease")
+            HStack(spacing: 5) {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.system(size: 15, weight: .semibold))
+                if count > 0 {
+                    Text("\(count)")
+                        .font(.number(size: 14, weight: .bold))
+                }
+            }
+            .foregroundStyle(count > 0 ? Theme.accent : Theme.ink)
+            .padding(.horizontal, count > 0 ? 12 : 0)
+            .frame(minWidth: 38, minHeight: 38)
+            .controlBackground(Capsule())
+            .overlay {
+                if count > 0 {
+                    Capsule().strokeBorder(Theme.accent, lineWidth: 1.5).padding(1)
+                }
+            }
         }
-        .accessibilityLabel(filter.sheetFilterCount > 0 ? "Filters, \(filter.sheetFilterCount) on" : "Filters")
+        .buttonStyle(.plain)
+        .accessibilityLabel(count > 0 ? "Filters, \(count) on" : "Filters")
     }
 
     /// One quiet line naming the sheet filters in use, with a way out.
     private var activeSummary: some View {
         HStack(spacing: 10) {
-            Image(systemName: "line.3.horizontal.decrease")
-                .font(.caption.weight(.semibold))
+            Image(systemName: "slider.horizontal.3")
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(Theme.accent)
             Text(summaryText)
-                .font(.footnote)
+                .font(.system(size: 13))
                 .foregroundStyle(Theme.inkSecondary)
                 .lineLimit(1)
                 .truncationMode(.tail)
@@ -146,12 +199,12 @@ struct ClimbsView: View {
                     filter.grades = grades
                 }
             }
-            .font(.footnote.weight(.semibold))
+            .font(.system(size: 13, weight: .semibold))
             .foregroundStyle(Theme.accent)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .glassEffect(.regular, in: .capsule)
+        .controlBackground(Capsule())
         .contentShape(.capsule)
         .onTapGesture { showingFilters = true }
         .transition(.opacity.combined(with: .move(edge: .top)))
@@ -170,15 +223,15 @@ struct ClimbsView: View {
             Image(systemName: "archivebox.fill")
                 .foregroundStyle(Theme.stripped)
             Text("No longer on the wall. Their logs, beta and stats are kept.")
-                .font(.footnote)
-                .foregroundStyle(Theme.inkSecondary)
+                .font(.system(size: 13))
+                .foregroundStyle(Theme.ink.opacity(0.85))
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.vertical, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Theme.stripped.opacity(0.10), in: .rect(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Theme.stripped.opacity(0.25), lineWidth: 1))
+        .background(Theme.danger.opacity(0.10), in: .rect(cornerRadius: 16))
+        .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Theme.danger.opacity(0.25), lineWidth: 1))
     }
 
     // MARK: Empty
@@ -218,16 +271,16 @@ struct ClimbRow: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            HexBadge(grade: climb.grade, color: climb.holdColor, size: 44, glowing: climb.isActive && climb.status.isTopped)
-                .saturation(climb.isActive ? 1 : 0)
-                .opacity(climb.isActive ? 1 : 0.55)
+            HexBadge(grade: climb.grade, color: climb.holdColor, size: 44,
+                     glowing: climb.isActive && (climb.status.isTopped || climb.status == .project),
+                     dim: !climb.isActive)
             VStack(alignment: .leading, spacing: 3) {
                 Text(climb.displayName)
-                    .font(.headline)
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(climb.isActive ? Theme.ink : Theme.inkSecondary)
                     .lineLimit(1)
                 Text(subtitle)
-                    .font(.subheadline)
+                    .font(.system(size: 14))
                     .foregroundStyle(climb.isActive ? Theme.inkSecondary : Theme.inkTertiary)
                     .lineLimit(1)
             }
@@ -235,28 +288,15 @@ struct ClimbRow: View {
             VStack(alignment: .trailing, spacing: 3) {
                 if let strippedAt = climb.strippedAt {
                     StrippedTag(date: strippedAt)
-                    Text("\(climb.status.name) · \(climb.tryCount == 1 ? "1 try" : "\(climb.tryCount) tries")")
-                        .font(.caption)
-                        .foregroundStyle(Theme.inkTertiary)
                 } else {
                     StatusLabel(status: climb.status)
-                    Text(climb.tryCount == 1 ? "1 try" : "\(climb.tryCount) tries")
-                        .font(.caption)
-                        .foregroundStyle(Theme.inkTertiary)
                 }
+                Text(Format.tries(climb.tryCount))
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.inkTertiary)
             }
         }
-        .glassCard(padding: 14, tint: climb.isActive ? nil : Theme.stripped.opacity(0.4))
-        .overlay(alignment: .leading) {
-            if !climb.isActive {
-                Capsule()
-                    .fill(Theme.stripped)
-                    .frame(width: 3)
-                    .padding(.vertical, 18)
-                    .padding(.leading, 5)
-                    .accessibilityHidden(true)
-            }
-        }
+        .glassCard(padding: 14, tint: climb.isActive ? nil : Theme.danger.opacity(0.5))
         .accessibilityElement(children: .combine)
     }
 
@@ -273,16 +313,13 @@ struct StrippedTag: View {
         Label {
             Text("Stripped · \(date.formatted(.dateTime.month(.abbreviated).day()))")
         } icon: {
-            Image(systemName: "archivebox.fill")
+            Image(systemName: "archivebox")
         }
-        .font(.caption.weight(.semibold))
-        .foregroundStyle(Theme.stripped)
+        .font(.system(size: 12, weight: .semibold))
+        .foregroundStyle(Theme.danger)
         .labelStyle(.titleAndIcon)
         .lineLimit(1)
         .fixedSize()
-        .padding(.horizontal, 8)
-        .padding(.vertical, 3)
-        .background(Theme.stripped.opacity(0.14), in: .capsule)
         .accessibilityLabel("Stripped on \(date.formatted(date: .long, time: .omitted))")
     }
 }

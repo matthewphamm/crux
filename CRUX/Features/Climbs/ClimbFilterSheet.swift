@@ -14,10 +14,7 @@ struct ClimbFilterSheet: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: Theme.Spacing.section) {
                     section("Sort by") {
-                        Picker("Sort by", selection: $sort.animation(.smooth)) {
-                            ForEach(ClimbSort.allCases) { Text($0.rawValue).tag($0) }
-                        }
-                        .pickerStyle(.segmented)
+                        CruxSegmented(options: ClimbSort.allCases, selection: $sort) { $0.rawValue }
                     }
 
                     if !walls.isEmpty {
@@ -42,7 +39,7 @@ struct ClimbFilterSheet: View {
                         }
                     }
 
-                    section("Hold color") {
+                    section("Hold colour") {
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 5), spacing: 10) {
                             ForEach(HoldColor.allCases) { color in
                                 let isOn = filter.colors.contains(color)
@@ -53,7 +50,7 @@ struct ClimbFilterSheet: View {
                                         .fill(color.color)
                                         .overlay(Circle().stroke(.white.opacity(0.15), lineWidth: 1))
                                         .padding(4)
-                                        .overlay(Circle().stroke(isOn ? Theme.ink : .clear, lineWidth: 2))
+                                        .overlay(Circle().stroke(isOn ? Theme.accent : .clear, lineWidth: 2))
                                         .frame(height: 44)
                                 }
                                 .buttonStyle(.plain)
@@ -77,7 +74,17 @@ struct ClimbFilterSheet: View {
                 .padding(.top, 8)
                 .padding(.bottom, 24)
             }
-            .nightGymBackground()
+            .background(Theme.sheet)
+            .scrollContentBackground(.hidden)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                Button(matchCount == 1 ? "Show 1 climb" : "Show \(matchCount) climbs") { dismiss() }
+                    .buttonStyle(AccentButtonStyle())
+                    .contentTransition(.numericText(value: Double(matchCount)))
+                    .padding(.horizontal, Theme.Spacing.gutter)
+                    .padding(.top, 10)
+                    .padding(.bottom, 8)
+                    .background(Theme.sheet)
+            }
             .navigationTitle("Filter")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -90,19 +97,22 @@ struct ClimbFilterSheet: View {
                             sort = .grade
                         }
                     }
+                    .foregroundStyle(Theme.accent)
                     .disabled(filter.sheetFilterCount == 0 && sort == .grade)
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(matchCount == 1 ? "Show 1 climb" : "Show \(matchCount) climbs") { dismiss() }
-                        .buttonStyle(.glassProminent)
-                        .contentTransition(.numericText(value: Double(matchCount)))
+                    Button("Done") { dismiss() }
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Theme.accent)
                 }
             }
             .cruxFeedback(.selection, trigger: filter)
             .cruxFeedback(.selection, trigger: sort)
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.large])
         .presentationDragIndicator(.visible)
+        .presentationBackground(Theme.sheet)
+        .presentationCornerRadius(Theme.Radius.sheet)
     }
 
     private func section<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
