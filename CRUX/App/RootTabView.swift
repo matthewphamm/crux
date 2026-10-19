@@ -1,7 +1,7 @@
 import SwiftData
 import SwiftUI
 
-enum AppTab: Hashable {
+enum AppTab: Hashable, CaseIterable {
     case home, climbs, walls, stats
 }
 
@@ -15,20 +15,19 @@ struct RootTabView: View {
 
     var body: some View {
         @Bindable var logger = logger
-        TabView(selection: $router.tab) {
-            Tab("Home", systemImage: "hexagon.fill", value: AppTab.home) {
-                HomeView()
-            }
-            Tab("Climbs", systemImage: "list.bullet", value: AppTab.climbs) {
-                ClimbsView()
-            }
-            Tab("Walls", systemImage: "square.3.layers.3d", value: AppTab.walls) {
-                WallsView()
-            }
-            Tab("Stats", systemImage: "chart.bar", value: AppTab.stats) {
-                StatsView()
+        // All four stay mounted so scroll position and pushed screens survive; switching cross-fades.
+        ZStack {
+            ForEach(AppTab.allCases, id: \.self) { tab in
+                let selected = router.tab == tab
+                screen(tab)
+                    .opacity(selected ? 1 : 0)
+                    .scaleEffect(selected ? 1 : 0.985)
+                    .allowsHitTesting(selected)
+                    .accessibilityHidden(!selected)
+                    .zIndex(selected ? 1 : 0)
             }
         }
+        .animation(.easeInOut(duration: 0.28), value: router.tab)
         .environment(router)
         .overlay { GymMenuOverlay() }
         .onChange(of: router.tab) { gymMenu.isOpen = false }
@@ -47,6 +46,16 @@ struct RootTabView: View {
             applyLaunchArguments()
             #endif
             await watchSessionTimeout()
+        }
+    }
+
+    @ViewBuilder
+    private func screen(_ tab: AppTab) -> some View {
+        switch tab {
+        case .home: HomeView()
+        case .climbs: ClimbsView()
+        case .walls: WallsView()
+        case .stats: StatsView()
         }
     }
 
