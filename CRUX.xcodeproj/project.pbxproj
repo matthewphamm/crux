@@ -45,6 +45,7 @@
 		C15A621D5F45774F19C7E65D /* ClimbFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48BB53C7497953C0801F8A1D /* ClimbFilter.swift */; };
 		C4E2420A16B283E660E98FC6 /* Attempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B8BE3C36DD1E25CD4D2C829 /* Attempt.swift */; };
 		C64D12F32C2F0BD79B515699 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CE8D9B0EE6C38C260D8918F /* SettingsView.swift */; };
+		CE1CEE66E6F7F07026A48462 /* MediaStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CAC1BF4EF0F319242874B5 /* MediaStoreTests.swift */; };
 		CED13F1170F47BD0B77BD94E /* GymLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A657D474C3DDDC997D340B56 /* GymLocator.swift */; };
 		D1CE6CF712567CBBB335940C /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74BC59F860C4166DBD3223A /* RootTabView.swift */; };
 		D3A2234782631B6B6FEA8BA9 /* ResetService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C0E1641B57BE6A9BD7B474A /* ResetService.swift */; };
@@ -80,6 +81,7 @@
 		0525945B0D35936CD97C734B /* ProjectSendHaptic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectSendHaptic.swift; sourceTree = "<group>"; };
 		072F543132C084704FAEF417 /* ClimbFilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClimbFilterSheet.swift; sourceTree = "<group>"; };
 		0A4C8CC0825BA7D5D3DA2B0D /* CRUXTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CRUXTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		19CAC1BF4EF0F319242874B5 /* MediaStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaStoreTests.swift; sourceTree = "<group>"; };
 		1A6EC4A5C91D8E1CC6305982 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		1ACD6AC3F9D42A84D7C57669 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		1BB317AE677D93056D34AB66 /* SettingsComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsComponents.swift; sourceTree = "<group>"; };
@@ -220,6 +222,7 @@
 			children = (
 				DB0B9BC93C63B258FF39A63E /* GradingAndStatusTests.swift */,
 				1BEE13054E7C74C6C06CCF84 /* GymTests.swift */,
+				19CAC1BF4EF0F319242874B5 /* MediaStoreTests.swift */,
 				C8E98FBD15ABC51A75532BA5 /* SessionManagerTests.swift */,
 				A37A38476DD88ACC68CCD0BB /* StatsServiceTests.swift */,
 				FE9EEF1A8F629E7CDF6DB76B /* TestSupport.swift */,
@@ -459,6 +462,7 @@
 			files = (
 				E7A98BDC4FB7604285F0E14F /* GradingAndStatusTests.swift in Sources */,
 				09E4A23AD583EB6C5079B4AF /* GymTests.swift in Sources */,
+				CE1CEE66E6F7F07026A48462 /* MediaStoreTests.swift in Sources */,
 				813338465EFA5CFCCE47FECA /* SessionManagerTests.swift in Sources */,
 				EA3195E45383C6B0597FE419 /* StatsServiceTests.swift in Sources */,
 				F5EACA4131567ADE4313B51C /* TestSupport.swift in Sources */,

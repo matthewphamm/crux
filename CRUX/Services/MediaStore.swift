@@ -37,7 +37,7 @@ enum MediaStore {
     }
 
     static func image(for fileName: String) -> UIImage? {
-        UIImage(contentsOfFile: url(for: fileName).path())
+        UIImage(contentsOfFile: url(for: fileName).path(percentEncoded: false))
     }
 
     /// A poster frame for a stored video.
